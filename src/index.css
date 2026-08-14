@@ -202,3 +202,44 @@ a[href]:active {
     transform: none;
   }
 }
+
+[popover]:is(:popover-open, .\:popover-open) {
+  display: block;
+}
+
+.user-menu {
+  width: min(18rem, calc(100vw - 1.5rem));
+  margin: 0;
+  inset: auto;
+  top: 4.5rem;
+  right: 1rem;
+  border: 1px solid color-mix(in srgb, var(--outline-variant) 70%, transparent);
+  border-radius: 1rem;
+  background: var(--surface-container-lowest);
+  box-shadow: 0 16px 40px rgba(15, 35, 28, 0.14);
+  padding: 0.35rem;
+}
+
+@supports (position-area: block-end) {
+  .user-menu {
+    position-area: block-end span-inline-start;
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    inset: unset;
+    margin: 0.4rem 0 0;
+  }
+}
+
+button.user-menu-trigger:hover,
+button.user-menu-trigger:active {
+  outline: none;
+  filter: none;
+  transform: none;
+}
+
+button.user-menu-trigger:hover {
+  background-color: var(--surface-container-high);
+}
+
+button.user-menu-item:hover {
+  background-color: color-mix(in srgb, var(--error) 8%, transparent);
+}

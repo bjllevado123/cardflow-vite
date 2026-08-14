@@ -8,6 +8,10 @@ import { BrandSplash } from "@/components/brand-splash";
 import { router } from "@/router";
 import "./index.css";
 
+if (!("popover" in HTMLElement.prototype)) {
+  void import("@oddbird/popover-polyfill");
+}
+
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(

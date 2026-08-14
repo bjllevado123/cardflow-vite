@@ -2,8 +2,8 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { BrandLogo } from "@/components/brand-logo";
 import { PwaRegister } from "@/components/pwa-register";
-import { SignOutButton } from "@/components/sign-out-button";
 import { TransactionForm } from "@/components/transaction-form";
+import { UserMenuPopover, UserMenuTrigger } from "@/components/user-menu";
 import { useAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
@@ -59,16 +59,7 @@ export function Shell() {
         </nav>
         <div className="mt-auto space-y-3 px-1 pb-1">
           <TransactionForm cards={cards} periods={periods} trigger="header" />
-          <div className="flex items-center gap-3 rounded-2xl px-2 py-2">
-            <span className="grid size-9 place-items-center rounded-full bg-primary text-xs font-bold text-on-primary">
-              {name.slice(0, 1).toUpperCase()}
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold">{name}</p>
-              <p className="truncate text-xs text-on-surface-variant">{user?.email}</p>
-            </div>
-          </div>
-          <SignOutButton className="w-full" />
+          <UserMenuTrigger name={name} email={user?.email} variant="sidebar" />
         </div>
       </aside>
 
@@ -78,12 +69,10 @@ export function Shell() {
             <BrandLogo size="sm" />
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <span className="hidden size-9 place-items-center rounded-full bg-surface-container-high text-sm font-bold md:grid">
-              {name.slice(0, 1).toUpperCase()}
-            </span>
-            <SignOutButton variant="ghost" className="h-10" />
+            <UserMenuTrigger name={name} email={user?.email} variant="header" />
           </div>
         </header>
+        <UserMenuPopover name={name} email={user?.email} />
         <main className="flex-1 px-4 pb-24 pt-5 md:px-10 md:pb-10">
           <div className="mx-auto max-w-[1200px] space-y-8 animate-rise-delay-1 md:space-y-10">
             <Outlet />
