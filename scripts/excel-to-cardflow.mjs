@@ -21,6 +21,11 @@ const JOBS = [
     out: resolve(root, "src/data/parents.json"),
     email: "parents@cardflow.app",
   },
+  {
+    file: resolve(downloads, "CC Tracker - Tatay & Nanay 2026.xlsx"),
+    out: resolve(root, "src/data/mariel.json"),
+    email: "mariellevado48@gmail.com",
+  },
 ];
 
 const WALLET_RE = /gcash|gotyme|go tyme|maya|paymaya|shopee|cash/i;
