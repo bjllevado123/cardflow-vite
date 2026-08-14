@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="ink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1f17"/>
+      <stop offset="48%" stop-color="#123528"/>
+      <stop offset="100%" stop-color="#0a1628"/>
+    </linearGradient>
+    <linearGradient id="mint" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9af5c8"/>
+      <stop offset="100%" stop-color="#3dd68c"/>
+    </linearGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="10.24" stdDeviation="14.34" flood-color="#0a281c" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="#f3f7f5"/>
+  <rect x="61.44" y="61.44" width="389.12" height="389.12" rx="108.95360000000001" fill="url(#ink)" filter="url(#soft)"/>
+  <rect x="82.8416" y="82.8416" width="346.3168" height="346.3168" rx="87.552" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="4.096"/>
+  <g transform="translate(174.751744, 152.649728) rotate(8 112.84479999999999 81.7152)">
+    <rect width="225.68959999999998" height="163.4304" rx="31.1296" fill="rgba(255,255,255,0.16)"/>
+  </g>
+  <g transform="translate(129.61382400000002, 191.87302400000002)">
+    <rect width="225.68959999999998" height="163.4304" rx="31.1296" fill="url(#mint)" filter="url(#soft)"/>
+    <rect x="27.082751999999996" y="35.954688" width="63.193088" height="19.611648" rx="9.805824" fill="rgba(255,255,255,0.72)"/>
+  </g>
+</svg>
