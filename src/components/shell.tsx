@@ -2,6 +2,7 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { BrandLogo } from "@/components/brand-logo";
 import { PwaRegister } from "@/components/pwa-register";
+import { SignOutButton } from "@/components/sign-out-button";
 import { TransactionForm } from "@/components/transaction-form";
 import { useAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -41,10 +42,10 @@ export function Shell() {
                 key={item.to}
                 to={item.to}
                 className={cn(
-                  "relative flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm",
+                  "relative flex cursor-pointer items-center gap-3 rounded-2xl px-3.5 py-3 text-sm transition-colors duration-150",
                   active
                     ? "bg-secondary-container/80 font-semibold text-on-secondary-container"
-                    : "text-on-surface-variant hover:bg-surface-container-low",
+                    : "text-on-surface-variant hover:bg-surface-container-high active:bg-surface-container",
                 )}
               >
                 {active ? <span className="absolute left-0 top-1/2 h-7 w-1 -translate-y-1/2 rounded-full bg-secondary" /> : null}
@@ -67,6 +68,7 @@ export function Shell() {
               <p className="truncate text-xs text-on-surface-variant">{user?.email}</p>
             </div>
           </div>
+          <SignOutButton className="w-full" />
         </div>
       </aside>
 
@@ -75,9 +77,12 @@ export function Shell() {
           <div className="md:hidden">
             <BrandLogo size="sm" />
           </div>
-          <span className="ml-auto hidden size-9 place-items-center rounded-full bg-surface-container-high text-sm font-bold md:grid">
-            {name.slice(0, 1).toUpperCase()}
-          </span>
+          <div className="ml-auto flex items-center gap-2">
+            <span className="hidden size-9 place-items-center rounded-full bg-surface-container-high text-sm font-bold md:grid">
+              {name.slice(0, 1).toUpperCase()}
+            </span>
+            <SignOutButton variant="ghost" className="h-10" />
+          </div>
         </header>
         <main className="flex-1 px-4 pb-24 pt-5 md:px-10 md:pb-10">
           <div className="mx-auto max-w-[1200px] space-y-8 animate-rise-delay-1 md:space-y-10">
@@ -94,8 +99,10 @@ export function Shell() {
                     key={item.to}
                     to={item.to}
                     className={cn(
-                      "flex h-full w-full flex-col items-center justify-center gap-0.5",
-                      active ? "text-secondary" : "text-on-surface-variant opacity-70",
+                      "flex h-full w-full cursor-pointer flex-col items-center justify-center gap-0.5 transition-colors duration-150",
+                      active
+                        ? "text-secondary"
+                        : "text-on-surface-variant opacity-70 hover:text-on-surface hover:opacity-100 active:text-secondary",
                     )}
                   >
                     <span className="material-symbols-outlined text-[22px]">{item.icon}</span>

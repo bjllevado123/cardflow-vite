@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { SignOutButton } from "@/components/sign-out-button";
 import { PageHeader } from "@/components/ui/page-header";
 import { useAuth } from "@/lib/auth";
 import { getDefaultPeriodFilter, setDefaultPeriodFilter } from "@/lib/db";
-import { signOut } from "@/lib/supabase";
 
 export function SettingsPage() {
   const { user } = useAuth();
@@ -21,9 +20,7 @@ export function SettingsPage() {
         <h2 className="font-semibold">Account</h2>
         <div className="mt-3 flex items-center justify-between gap-3">
           <p className="text-sm">{user?.email ?? "Signed in"}</p>
-          <Button variant="outline" onClick={() => void signOut()}>
-            Sign out
-          </Button>
+          <SignOutButton />
         </div>
       </section>
       <section className="space-y-3 rounded-3xl border border-outline-variant/40 bg-surface-container-lowest p-5">

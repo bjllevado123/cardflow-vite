@@ -121,3 +121,84 @@ body {
   scrollbar-width: thin;
   scrollbar-color: color-mix(in srgb, var(--outline-variant) 80%, transparent) transparent;
 }
+
+button,
+[type="button"],
+[type="submit"],
+[type="reset"],
+select,
+summary,
+a[href],
+label[for] {
+  cursor: pointer;
+}
+
+button:disabled,
+[type="button"]:disabled,
+[type="submit"]:disabled,
+[type="reset"]:disabled,
+select:disabled,
+a[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+button:not(:disabled),
+[type="button"]:not(:disabled),
+[type="submit"]:not(:disabled),
+[type="reset"]:not(:disabled) {
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    opacity 150ms ease,
+    filter 150ms ease,
+    transform 120ms ease,
+    outline-color 150ms ease,
+    outline-offset 150ms ease;
+}
+
+button:not(:disabled):hover,
+[type="button"]:not(:disabled):hover,
+[type="submit"]:not(:disabled):hover,
+[type="reset"]:not(:disabled):hover {
+  filter: brightness(1.06) saturate(1.06);
+  outline: 2px solid color-mix(in srgb, var(--secondary) 55%, transparent);
+  outline-offset: 2px;
+}
+
+button:not(:disabled):active,
+[type="button"]:not(:disabled):active,
+[type="submit"]:not(:disabled):active,
+[type="reset"]:not(:disabled):active {
+  transform: translateY(1px) scale(0.98);
+  filter: brightness(0.9);
+  outline: 2px solid var(--secondary);
+  outline-offset: 1px;
+}
+
+a[href]:hover {
+  filter: brightness(0.97);
+}
+
+a[href]:active {
+  transform: translateY(1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href] {
+    transition: none;
+  }
+
+  button:not(:disabled):active,
+  [type="button"]:not(:disabled):active,
+  [type="submit"]:not(:disabled):active,
+  [type="reset"]:not(:disabled):active,
+  a[href]:active {
+    transform: none;
+  }
+}
