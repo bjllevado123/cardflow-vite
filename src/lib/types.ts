@@ -62,3 +62,13 @@ export type Snapshot = {
   transactions?: Transaction[];
   recurring_rules?: RecurringRule[];
 };
+
+export type SyncPayload = {
+  version: 1;
+  cards: Card[];
+  periods: BillingPeriod[];
+  transactions: Transaction[];
+  recurring_rules: RecurringRule[];
+  default_period_filter: DefaultPeriodFilter;
+  excel_revision: string;
+};

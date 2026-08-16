@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { closeUserDatabase, openUserDatabase } from "@/lib/db";
-import { importExcelIfEmpty } from "@/lib/excel-hydrate";
+import { listenForCloudSync, startCloudSync, stopCloudSync } from "@/lib/sync";
 
 export function UserDatabaseProvider({
   userId,
@@ -15,14 +15,19 @@ export function UserDatabaseProvider({
 
   useEffect(() => {
     let cancelled = false;
+    let teardown: (() => void) | undefined;
     setReady(false);
     void (async () => {
       await openUserDatabase(userId);
-      await importExcelIfEmpty(email);
-      if (!cancelled) setReady(true);
+      await startCloudSync(userId, email);
+      if (cancelled) return;
+      teardown = listenForCloudSync(userId);
+      setReady(true);
     })();
     return () => {
       cancelled = true;
+      teardown?.();
+      stopCloudSync();
       closeUserDatabase();
     };
   }, [userId, email]);

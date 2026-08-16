@@ -13,7 +13,7 @@ export async function importExcelIfEmpty(email: string | undefined) {
   const revision = snap.revision ?? "";
   if (!revision) return;
   const current = await getDb().meta.get("excel_revision");
-  if (current?.value === revision) return;
+  if (current?.value) return;
   await replaceSnapshot(snap);
   await getDb().meta.put({ key: "excel_revision", value: revision });
   await getDb().meta.put({ key: "default_period_filter", value: "closest_next" });
