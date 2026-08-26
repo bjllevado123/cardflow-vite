@@ -3,7 +3,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/auth";
-import { isStandalonePwa } from "@/lib/account-vault";
 import { signInWithGoogle, signInWithPassword, signUpWithPassword, supabaseEnabled } from "@/lib/supabase";
 
 export function SignInForm({
@@ -17,7 +16,6 @@ export function SignInForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
-  const standalone = isStandalonePwa();
 
   if (!supabaseEnabled) {
     return (
@@ -41,20 +39,49 @@ export function SignInForm({
 
   return (
     <div className="space-y-4">
-      {mode === "add" && standalone ? (
-        <p className="text-sm text-on-surface-variant">
-          In the installed app, add accounts with email and password. Google add works from the Safari or Chrome tab.
-        </p>
-      ) : (
+      <Button
+        className="w-full"
+        size="lg"
+        disabled={busy}
+        onClick={() => void run(mode === "add" ? addAccountWithGoogle : signInWithGoogle)}
+      >
+        Continue with Google
+      </Button>
+      <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.16em] text-on-surface-variant">
+        <span className="h-px flex-1 bg-outline-variant" />
+        or email
+        <span className="h-px flex-1 bg-outline-variant" />
+      </div>
+      <Input type="email" autoComplete="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+      <Input
+        type="password"
+        autoComplete="current-password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <div className="flex gap-2">
         <Button
-          className="w-full"
-          size="lg"
+          variant="outline"
+          className="flex-1"
           disabled={busy}
-          onClick={() => void run(mode === "add" ? addAccountWithGoogle : signInWithGoogle)}
+          onClick={() =>
+            void run(() =>
+              mode === "add" ? addAccountWithPassword(email, password) : signInWithPassword(email, password),
+            )
+          }
         >
-          Continue with Google
+          {mode === "add" ? "Add account" : "Sign in"}
         </Button>
-      )}
+        {mode === "login" ? (
+          <Button variant="ghost" className="flex-1" disabled={busy} onClick={() => void run(() => signUpWithPassword(email, password))}>
+            Sign up
+          </Button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
       <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.16em] text-on-surface-variant">
         <span className="h-px flex-1 bg-outline-variant" />
         or email
