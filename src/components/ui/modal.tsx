@@ -109,10 +109,12 @@ export function Modal({
     <dialog
       ref={dialogRef}
       aria-labelledby={titleId}
-      className={`m-auto flex max-h-[90vh] w-[calc(100%-2rem)] flex-col overflow-hidden rounded-2xl border-0 bg-surface-container-lowest p-0 shadow-[0_24px_80px_rgba(15,23,42,0.18)] ${wide ? "max-w-3xl" : "max-w-lg"}`}
+      className={`m-auto w-[calc(100%-2rem)] border-0 bg-transparent p-0 ${wide ? "max-w-3xl" : "max-w-lg"}`}
     >
-      <Header title={title} description={description} titleId={titleId} descId={descId} onClose={() => dialogRef.current?.close()} />
-      <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-2 pb-6">{children}</div>
+      <div className="grid max-h-[90vh] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-2xl bg-surface-container-lowest shadow-[0_24px_80px_rgba(15,23,42,0.18)]">
+        <Header title={title} description={description} titleId={titleId} descId={descId} onClose={() => dialogRef.current?.close()} />
+        <div className="overflow-y-auto px-6 pt-2 pb-6">{children}</div>
+      </div>
     </dialog>
   );
 }
