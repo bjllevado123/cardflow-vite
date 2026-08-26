@@ -1,5 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { setAddingAccount } from "@/lib/account-vault";
 import { supabase } from "@/lib/supabase";
 
 export function AuthCallbackPage() {
@@ -11,6 +12,7 @@ export function AuthCallbackPage() {
       return;
     }
     void supabase.auth.exchangeCodeForSession(window.location.href).finally(() => {
+      setAddingAccount(false);
       void navigate({ to: "/", replace: true });
     });
   }, [navigate]);

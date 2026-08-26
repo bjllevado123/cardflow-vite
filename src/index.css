@@ -241,5 +241,9 @@ button.user-menu-trigger:hover {
 }
 
 button.user-menu-item:hover {
+  background-color: var(--surface-container-high);
+}
+
+button.user-menu-item-danger:hover {
   background-color: color-mix(in srgb, var(--error) 8%, transparent);
 }

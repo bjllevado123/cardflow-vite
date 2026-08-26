@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { signOut } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 export function SignOutButton({
@@ -9,12 +9,13 @@ export function SignOutButton({
   className?: string;
   variant?: "outline" | "ghost" | "destructive";
 }) {
+  const { signOutThisAccount } = useAuth();
   return (
     <Button
       type="button"
       variant={variant}
       className={cn("shrink-0", className)}
-      onClick={() => void signOut()}
+      onClick={() => void signOutThisAccount()}
     >
       <span className="material-symbols-outlined text-[18px]" aria-hidden>
         logout

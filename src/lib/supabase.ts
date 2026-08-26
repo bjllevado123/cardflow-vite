@@ -38,7 +38,7 @@ export async function signUpWithPassword(email: string, password: string) {
   if (error) throw error;
 }
 
-export async function signOut() {
+export async function signOut(scope: "local" | "global" = "local") {
   if (!supabase) return;
-  await supabase.auth.signOut();
+  await supabase.auth.signOut({ scope });
 }
