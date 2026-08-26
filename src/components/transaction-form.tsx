@@ -5,6 +5,7 @@ import { Modal } from "@/components/ui/modal";
 import { addRecurringSeries, addTransaction, deleteTransaction, undoRecurringSeries } from "@/lib/db";
 import { formatDateList, generateOccurrenceDates, matchPeriodsForDates } from "@/lib/recurrence";
 import type { BillingPeriod, Card, RecurrenceCadence } from "@/lib/types";
+import { parseMoneyInput } from "@/lib/money";
 import { todayIso } from "@/lib/utils";
 
 export function TransactionForm({
@@ -98,7 +99,7 @@ export function TransactionForm({
 
   async function save(fd: FormData) {
     setError(null);
-    const amount = Number(String(fd.get("amount") ?? "").replace(/,/g, ""));
+    const amount = parseMoneyInput(fd.get("amount"));
     const card_id = String(fd.get("card_id") ?? "");
     const notes = String(fd.get("notes") ?? "");
     if (!card_id || !(amount > 0)) {
@@ -270,7 +271,28 @@ export function TransactionForm({
             ) : null}
             <label className="block">
               <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">Amount</span>
-              <input name="amount" inputMode="decimal" required className={fieldClass} placeholder="0.00" />
+              <input
+                id="txn-amount"
+                name="amount"
+                inputMode="decimal"
+                enterKeyHint="done"
+                autoComplete="transaction-amount"
+                required
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? "txn-amount-error" : undefined}
+                className={fieldClass}
+                placeholder="0.00"
+                onPaste={(e) => {
+                  const parsed = parseMoneyInput(e.clipboardData.getData("text"));
+                  if (!(parsed > 0)) return;
+                  e.preventDefault();
+                  e.currentTarget.value = String(parsed);
+                }}
+                onBlur={(e) => {
+                  const parsed = parseMoneyInput(e.currentTarget.value);
+                  if (parsed > 0) e.currentTarget.value = String(parsed);
+                }}
+              />
             </label>
             <label className="block">
               <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">Card</span>
@@ -314,7 +336,11 @@ export function TransactionForm({
               <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">Note</span>
               <input name="notes" className={fieldClass} placeholder="e.g. Shell Catarman" />
             </label>
-            {error ? <p className="text-sm text-error">{error}</p> : null}
+            {error ? (
+              <p id="txn-amount-error" className="text-sm text-error" role="alert">
+                {error}
+              </p>
+            ) : null}
             <button type="submit" className="h-12 w-full rounded-xl bg-primary font-semibold text-on-primary">
               {recurring ? "Save recurring series" : "Save"}
             </button>

@@ -43,3 +43,22 @@ export function formatSignedPHP(amount: number, type: "charge" | "payment"): str
 export function roundMoney(n: number): number {
   return Math.round((n + Number.EPSILON) * 100) / 100;
 }
+
+/** Parse an amount typed or pasted as PHP (commas, ₱, spaces, signed copies). */
+export function parseMoneyInput(raw: unknown): number {
+  const text = String(raw ?? "").trim();
+  if (!text) return NaN;
+
+  const compact = text
+    .replace(/\bphp\b/gi, "")
+    .replace(/[₱$€£¥]/g, "")
+    .replace(/[\s\u00a0\u202f\u2007\u2009'’_，‚]/g, "")
+    .replace(/,/g, "");
+
+  const numeric = compact.replace(/[^\d.]/g, "");
+  if (!numeric || numeric === ".") return NaN;
+
+  const n = Number(numeric);
+  if (!Number.isFinite(n)) return NaN;
+  return roundMoney(Math.abs(n));
+}
