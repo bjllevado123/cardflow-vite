@@ -313,6 +313,24 @@ export async function deleteTransaction(id: string) {
   emitChange();
 }
 
+export async function applyPendingDataFixes() {
+  const dbx = getDb();
+  const key = "fix_oneplus15_recurring_2027_08_30";
+  const done = await dbx.meta.get(key);
+  if (done?.value === "1") return;
+  const rows = await dbx.transactions.toArray();
+  const matches = rows.filter((t) => {
+    const notes = (t.notes ?? "").trim().toLowerCase();
+    const onDate = t.txn_date === "2027-08-30" || t.billing_period_id === "per_2027-08-30";
+    return notes === "oneplus 15" && Number(t.amount) === 2500 && onDate && t.type === "charge" && t.frequency !== "recurring";
+  });
+  for (const t of matches) {
+    await dbx.transactions.update(t.id, { frequency: "recurring" });
+  }
+  await dbx.meta.put({ key, value: "1" });
+  if (matches.length) emitChange();
+}
+
 export async function getDefaultPeriodFilter(): Promise<"all" | "closest_next"> {
   const row = await getDb().meta.get("default_period_filter");
   return row?.value === "all" ? "all" : "closest_next";

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { closeUserDatabase, openUserDatabase } from "@/lib/db";
+import { applyPendingDataFixes, closeUserDatabase, openUserDatabase } from "@/lib/db";
 import { listenForCloudSync, startCloudSync, stopCloudSync } from "@/lib/sync";
 
 export function UserDatabaseProvider({
@@ -20,6 +20,7 @@ export function UserDatabaseProvider({
     void (async () => {
       await openUserDatabase(userId);
       await startCloudSync(userId, email);
+      await applyPendingDataFixes();
       if (cancelled) return;
       teardown = listenForCloudSync(userId);
       setReady(true);
