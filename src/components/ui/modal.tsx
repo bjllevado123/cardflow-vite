@@ -22,13 +22,13 @@ function Header({
   onClose: () => void;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-2">
+    <div className="flex shrink-0 items-start justify-between gap-4 px-6 pt-5 pb-2">
       <div>
         <h2 id={titleId} className="text-xl font-semibold text-on-background">
           {title}
         </h2>
         {description ? (
-          <p id={descId} className="text-sm text-on-surface-variant mt-1">
+          <p id={descId} className="mt-1 text-sm text-on-surface-variant">
             {description}
           </p>
         ) : null}
@@ -36,7 +36,7 @@ function Header({
       <button
         type="button"
         onClick={onClose}
-        className="w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant"
+        className="flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high"
         aria-label="Close"
       >
         <span className="material-symbols-outlined">close</span>
@@ -84,16 +84,21 @@ export function Modal({
 
   if (isMobile) {
     return (
-      <Drawer.Root open={open} onOpenChange={(next) => !next && onClose()}>
+      <Drawer.Root handleOnly open={open} onOpenChange={(next) => !next && onClose()}>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 z-[70] bg-primary/40 backdrop-blur-sm" />
           <Drawer.Content
             aria-labelledby={titleId}
-            className="fixed bottom-0 left-0 right-0 z-[71] flex max-h-[92vh] flex-col rounded-t-3xl bg-surface-container-lowest outline-none"
+            className="fixed right-0 bottom-0 left-0 z-[71] flex max-h-[92vh] flex-col rounded-t-3xl bg-surface-container-lowest outline-none"
           >
-            <div className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-outline-variant" />
+            <div className="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-outline-variant" />
             <Header title={title} description={description} titleId={titleId} descId={descId} onClose={onClose} />
-            <div className="overflow-y-auto px-6 pb-8 pt-2">{children}</div>
+            <div
+              data-vaul-no-drag
+              className="min-h-0 flex-1 touch-pan-y overflow-y-auto overscroll-contain px-6 pt-2 pb-8"
+            >
+              {children}
+            </div>
           </Drawer.Content>
         </Drawer.Portal>
       </Drawer.Root>
@@ -104,10 +109,10 @@ export function Modal({
     <dialog
       ref={dialogRef}
       aria-labelledby={titleId}
-      className={`m-auto w-[calc(100%-2rem)] ${wide ? "max-w-3xl" : "max-w-lg"} rounded-2xl border-0 bg-surface-container-lowest p-0 shadow-[0_24px_80px_rgba(15,23,42,0.18)]`}
+      className={`m-auto flex max-h-[90vh] w-[calc(100%-2rem)] flex-col overflow-hidden rounded-2xl border-0 bg-surface-container-lowest p-0 shadow-[0_24px_80px_rgba(15,23,42,0.18)] ${wide ? "max-w-3xl" : "max-w-lg"}`}
     >
       <Header title={title} description={description} titleId={titleId} descId={descId} onClose={() => dialogRef.current?.close()} />
-      <div className="px-6 pb-6 pt-2">{children}</div>
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-2 pb-6">{children}</div>
     </dialog>
   );
 }

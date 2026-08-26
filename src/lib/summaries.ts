@@ -1,5 +1,5 @@
 import type { BillingPeriod, Card, Transaction } from "./types";
-import { roundMoney } from "./money";
+import { amountMatchesQuery, roundMoney } from "./money";
 
 export function computeBalances(cards: Card[], transactions: Pick<Transaction, "card_id" | "type" | "amount">[]) {
   const byCard = new Map<string, { charges: number; payments: number }>();
@@ -37,11 +37,15 @@ export function filterTransactions(
   transactions: Transaction[],
   opts: { periodId?: string; cardId?: string; q?: string },
 ) {
-  const q = (opts.q ?? "").trim().toLowerCase();
+  const raw = (opts.q ?? "").trim();
+  const q = raw.toLowerCase();
   return transactions.filter((t) => {
     if (opts.periodId && t.billing_period_id !== opts.periodId) return false;
     if (opts.cardId && t.card_id !== opts.cardId) return false;
-    if (q && !(t.notes ?? "").toLowerCase().includes(q)) return false;
+    if (q) {
+      const notesHit = (t.notes ?? "").toLowerCase().includes(q);
+      if (!notesHit && !amountMatchesQuery(Number(t.amount), raw)) return false;
+    }
     return true;
   });
 }

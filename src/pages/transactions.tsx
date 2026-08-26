@@ -67,7 +67,8 @@ export function TransactionsPage() {
         <div className="grid grid-cols-1 gap-3 md:grid-cols-12 md:gap-4">
           <input
             value={q}
-            placeholder="Search notes…"
+            aria-label="Search notes or amount"
+            placeholder="Search notes or amount…"
             className="min-h-12 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 outline-none focus:border-primary md:col-span-5"
             onChange={(e) => {
               const value = e.target.value;

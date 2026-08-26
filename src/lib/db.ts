@@ -1,5 +1,6 @@
 import Dexie, { type EntityTable } from "dexie";
-import type { BillingPeriod, Card, RecurringRule, Snapshot, SyncPayload, Transaction } from "./types";
+import { formatPeriodLabel } from "./recurrence";
+import type { BillingPeriod, Card, RecurrenceCadence, RecurringRule, Snapshot, SyncPayload, Transaction } from "./types";
 import { newId, todayIso } from "./utils";
 
 class CardflowDB extends Dexie {
@@ -172,23 +173,31 @@ export async function addCard(input: Omit<Card, "id" | "created_at" | "sort_orde
   return row;
 }
 
-export async function addPeriod(period_date: string, label?: string) {
-  const pretty =
-    label?.trim() ||
-    new Date(`${period_date}T00:00:00`).toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  const row: BillingPeriod = {
+function periodRow(period_date: string, label?: string): BillingPeriod {
+  return {
     id: `per_${period_date}`,
     period_date,
-    label: pretty,
+    label: formatPeriodLabel(period_date, label),
     created_at: new Date().toISOString(),
   };
+}
+
+export async function addPeriod(period_date: string, label?: string) {
+  const row = periodRow(period_date, label);
   await getDb().periods.put(row);
   emitChange();
   return row;
+}
+
+export async function addPeriods(dates: string[]) {
+  const unique = [...new Set(dates)];
+  const dbx = getDb();
+  const existing = await dbx.periods.bulkGet(unique.map((d) => `per_${d}`));
+  const existingDates = new Set(existing.filter(Boolean).map((p) => p!.period_date));
+  const created = unique.filter((d) => !existingDates.has(d)).map((d) => periodRow(d));
+  if (created.length) await dbx.periods.bulkPut(created);
+  emitChange();
+  return { created, skipped: unique.filter((d) => existingDates.has(d)) };
 }
 
 export async function addTransaction(input: {
@@ -199,12 +208,13 @@ export async function addTransaction(input: {
   notes?: string;
   frequency?: Transaction["frequency"];
   txn_date?: string;
+  recurring_rule_id?: string | null;
 }) {
   const row: Transaction = {
     id: newId("txn"),
     card_id: input.card_id,
     billing_period_id: input.billing_period_id,
-    recurring_rule_id: null,
+    recurring_rule_id: input.recurring_rule_id ?? null,
     txn_date: input.txn_date ?? todayIso(),
     type: input.type,
     frequency: input.frequency ?? "one_time",
@@ -215,6 +225,87 @@ export async function addTransaction(input: {
   await getDb().transactions.add(row);
   emitChange();
   return row;
+}
+
+export async function addRecurringSeries(input: {
+  card_id: string;
+  type: Transaction["type"];
+  amount: number;
+  notes?: string;
+  cadence: RecurrenceCadence;
+  start_date: string;
+  occurrence_count: number;
+  dates: string[];
+  createMissingPeriods: boolean;
+}) {
+  const dbx = getDb();
+  const notes = input.notes?.trim() || null;
+  const now = new Date().toISOString();
+  const result = await dbx.transaction("rw", dbx.periods, dbx.transactions, dbx.recurring, async () => {
+    const createdPeriods: BillingPeriod[] = [];
+    if (input.createMissingPeriods) {
+      const existing = await dbx.periods.bulkGet(input.dates.map((d) => `per_${d}`));
+      const have = new Set(existing.filter(Boolean).map((p) => p!.period_date));
+      const toCreate = input.dates.filter((date) => !have.has(date)).map((date) => periodRow(date));
+      if (toCreate.length) {
+        await dbx.periods.bulkPut(toCreate);
+        createdPeriods.push(...toCreate);
+      }
+    }
+
+    const periods = await dbx.periods.bulkGet(input.dates.map((d) => `per_${d}`));
+    const byDate = new Map(periods.filter(Boolean).map((p) => [p!.period_date, p!]));
+    const datesToWrite = input.dates.filter((d) => byDate.has(d));
+    if (datesToWrite.length === 0) {
+      throw new Error("No matching billing periods for this series");
+    }
+
+    const rule: RecurringRule = {
+      id: newId("sub"),
+      card_id: input.card_id,
+      type: input.type,
+      amount: input.amount,
+      notes,
+      start_date: input.start_date,
+      end_date: datesToWrite[datesToWrite.length - 1] ?? null,
+      cadence: input.cadence,
+      occurrence_count: input.occurrence_count,
+      active: true,
+      created_at: now,
+    };
+    await dbx.recurring.add(rule);
+
+    const transactions: Transaction[] = datesToWrite.map((date) => ({
+      id: newId("txn"),
+      card_id: input.card_id,
+      billing_period_id: byDate.get(date)!.id,
+      recurring_rule_id: rule.id,
+      txn_date: date,
+      type: input.type,
+      frequency: "recurring",
+      amount: input.amount,
+      notes,
+      created_at: now,
+    }));
+    await dbx.transactions.bulkAdd(transactions);
+    return { rule, transactions, createdPeriods };
+  });
+  emitChange();
+  return result;
+}
+
+export async function undoRecurringSeries(input: {
+  transactionIds: string[];
+  periodIds: string[];
+  ruleId: string;
+}) {
+  const dbx = getDb();
+  await dbx.transaction("rw", dbx.periods, dbx.transactions, dbx.recurring, async () => {
+    await dbx.transactions.bulkDelete(input.transactionIds);
+    if (input.periodIds.length) await dbx.periods.bulkDelete(input.periodIds);
+    await dbx.recurring.delete(input.ruleId);
+  });
+  emitChange();
 }
 
 export async function deleteTransaction(id: string) {

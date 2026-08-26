@@ -1,5 +1,6 @@
 export type TxnType = "charge" | "payment";
 export type TxnFrequency = "one_time" | "recurring";
+export type RecurrenceCadence = "weekly" | "biweekly" | "monthly" | "semi_monthly";
 export type DefaultPeriodFilter = "all" | "closest_next";
 
 export type Card = {
@@ -29,7 +30,8 @@ export type RecurringRule = {
   notes: string | null;
   start_date: string;
   end_date: string | null;
-  cadence: "semi_monthly" | "monthly";
+  cadence: RecurrenceCadence;
+  occurrence_count?: number | null;
   active: boolean;
   created_at: string;
 };
