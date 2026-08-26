@@ -50,7 +50,7 @@ export function RecurrenceFields({
         </label>
       ) : null}
       <label className="block">
-        <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">Repeat</span>
+        <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">Repeat every</span>
         <select
           value={cadence}
           className={fieldClass}

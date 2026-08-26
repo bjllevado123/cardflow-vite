@@ -160,11 +160,13 @@ export function TransactionForm({
       <Modal
         open={open}
         onClose={close}
-        title={pending ? "Missing billing periods" : "Add transaction"}
+        title={pending ? "Missing billing periods" : recurring ? "Add recurring transaction" : "Add transaction"}
         description={
           pending
             ? "Some dates in this series do not have a billing period yet."
-            : "Log a charge or payment against a billing period."
+            : recurring
+              ? "This will create one entry per date. If a billing period is missing, you can create it or skip it."
+              : "Log a one-time charge or payment, or switch to Recurring for a series."
         }
         wide
       >
@@ -225,6 +227,47 @@ export function TransactionForm({
                 </button>
               ))}
             </div>
+            <div>
+              <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">How often</span>
+              <div className="mt-1 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setRecurring(false)}
+                  className={`h-11 rounded-xl border text-sm font-semibold ${
+                    !recurring ? "border-primary bg-primary text-on-primary" : "border-outline-variant"
+                  }`}
+                >
+                  One-time
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRecurring(true)}
+                  className={`h-11 rounded-xl border text-sm font-semibold ${
+                    recurring ? "border-primary bg-primary text-on-primary" : "border-outline-variant"
+                  }`}
+                >
+                  Recurring
+                </button>
+              </div>
+            </div>
+            {recurring ? (
+              <RecurrenceFields
+                cadence={cadence}
+                count={count}
+                startDate={txnDate}
+                dayOfMonth={dayOfMonth}
+                previewDates={previewDates}
+                missingCount={previewMatch.missing.length}
+                onCadenceChange={setCadence}
+                onCountChange={setCount}
+                onStartDateChange={(value) => {
+                  setTxnDate(value);
+                  const day = Number(value.slice(8, 10));
+                  if (day) setDayOfMonth(day);
+                }}
+                onDayOfMonthChange={setDayOfMonth}
+              />
+            ) : null}
             <label className="block">
               <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">Amount</span>
               <input name="amount" inputMode="decimal" required className={fieldClass} placeholder="0.00" />
@@ -251,51 +294,29 @@ export function TransactionForm({
                 </select>
               </label>
             )}
-            <label className="block">
-              <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">
-                {recurring ? "Start date" : "Date"}
-              </span>
-              <input
-                name="txn_date"
-                type="date"
-                value={txnDate}
-                className={fieldClass}
-                onChange={(e) => {
-                  setTxnDate(e.target.value);
-                  const day = Number(e.target.value.slice(8, 10));
-                  if (day) setDayOfMonth(day);
-                }}
-              />
-            </label>
+            {recurring ? null : (
+              <label className="block">
+                <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">Date</span>
+                <input
+                  name="txn_date"
+                  type="date"
+                  value={txnDate}
+                  className={fieldClass}
+                  onChange={(e) => {
+                    setTxnDate(e.target.value);
+                    const day = Number(e.target.value.slice(8, 10));
+                    if (day) setDayOfMonth(day);
+                  }}
+                />
+              </label>
+            )}
             <label className="block">
               <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">Note</span>
               <input name="notes" className={fieldClass} placeholder="e.g. Shell Catarman" />
             </label>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={recurring}
-                onChange={(e) => setRecurring(e.target.checked)}
-              />
-              Recurring
-            </label>
-            {recurring ? (
-              <RecurrenceFields
-                cadence={cadence}
-                count={count}
-                startDate={txnDate}
-                dayOfMonth={dayOfMonth}
-                previewDates={previewDates}
-                missingCount={previewMatch.missing.length}
-                showStartDate={false}
-                onCadenceChange={setCadence}
-                onCountChange={setCount}
-                onDayOfMonthChange={setDayOfMonth}
-              />
-            ) : null}
             {error ? <p className="text-sm text-error">{error}</p> : null}
             <button type="submit" className="h-12 w-full rounded-xl bg-primary font-semibold text-on-primary">
-              Save
+              {recurring ? "Save recurring series" : "Save"}
             </button>
           </form>
         )}
