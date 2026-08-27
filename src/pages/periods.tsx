@@ -39,7 +39,7 @@ export function PeriodsPage() {
             <Link
               key={r.period.id}
               to="/transactions"
-              search={{ q: undefined, card: undefined, period: r.period.id }}
+              search={{ q: undefined, card: undefined, period: r.period.id, sort: undefined }}
               className="grid grid-cols-1 items-center gap-1 border-b border-outline-variant/40 px-5 py-4 last:border-0 hover:bg-surface-container-low/70 sm:grid-cols-12 sm:gap-3"
             >
               <div className="min-w-0 sm:col-span-5">

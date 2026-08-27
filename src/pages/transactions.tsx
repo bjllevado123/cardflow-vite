@@ -7,7 +7,7 @@ import { TransactionTotals } from "@/components/transaction-totals";
 import { EmptyState, PageHeader } from "@/components/ui/page-header";
 import { db, getDefaultPeriodFilter } from "@/lib/db";
 import { findClosestNextPeriod } from "@/lib/period-preference";
-import { filterTransactions, sumTransactions } from "@/lib/summaries";
+import { filterTransactions, sortTransactionsByCreated, sumTransactions, type CreatedSort } from "@/lib/summaries";
 
 export function TransactionsPage() {
   const search = useSearch({ from: "/transactions" });
@@ -35,22 +35,21 @@ export function TransactionsPage() {
 
   const periodId = !search.period || search.period === "all" ? undefined : search.period;
   const cardId = search.card || undefined;
+  const createdSort: CreatedSort = search.sort === "oldest" ? "oldest" : "newest";
   const filtered = useMemo(
-    () =>
-      filterTransactions(allTxns, { periodId, cardId, q: search.q }).sort(
-        (a, b) => (b.txn_date ?? "").localeCompare(a.txn_date ?? "") || b.created_at.localeCompare(a.created_at),
-      ),
-    [allTxns, periodId, cardId, search.q],
+    () => sortTransactionsByCreated(filterTransactions(allTxns, { periodId, cardId, q: search.q }), createdSort),
+    [allTxns, periodId, cardId, search.q, createdSort],
   );
   const totals = sumTransactions(filtered);
   const cardMap = Object.fromEntries(cards.map((c) => [c.id, c]));
 
-  function patch(next: { q?: string; card?: string; period?: string }) {
+  function patch(next: { q?: string; card?: string; period?: string; sort?: CreatedSort }) {
     void navigate({
       search: (prev) => ({
         q: next.q !== undefined ? next.q || undefined : prev.q,
         card: next.card !== undefined ? next.card || undefined : prev.card,
         period: next.period !== undefined ? next.period : prev.period,
+        sort: next.sort !== undefined ? (next.sort === "oldest" ? "oldest" : undefined) : prev.sort,
       }),
       replace: true,
     });
@@ -105,7 +104,7 @@ export function TransactionsPage() {
             className="min-h-12 rounded-xl border border-outline-variant text-sm font-semibold text-on-surface-variant md:col-span-1"
             onClick={() => {
               setQ("");
-              void navigate({ search: { q: undefined, card: undefined, period: "all" }, replace: true });
+              void navigate({ search: { q: undefined, card: undefined, period: "all", sort: undefined }, replace: true });
             }}
           >
             Clear
@@ -116,14 +115,31 @@ export function TransactionsPage() {
       <TransactionTotals charges={totals.charges} payments={totals.payments} balance={totals.balance} />
 
       <section className="overflow-hidden rounded-2xl border border-outline-variant/40 bg-surface-container-lowest shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
-        <div className="flex items-center justify-between border-b border-outline-variant/60 bg-surface-container-low/40 px-5 py-4 md:px-6">
+        <div className="flex flex-col gap-3 border-b border-outline-variant/60 bg-surface-container-low/40 px-5 py-4 md:flex-row md:items-center md:justify-between md:px-6">
           <div>
             <h3 className="font-semibold">Activity</h3>
             <p className="mt-0.5 text-xs text-on-surface-variant">{filtered.length} shown</p>
           </div>
-          <Link to="/periods" className="text-sm font-semibold text-secondary">
-            By period →
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="grid min-w-[11rem] flex-1 grid-cols-2 gap-1 sm:flex-none" role="group" aria-label="Sort by time logged">
+              {(["newest", "oldest"] as const).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={createdSort === value}
+                  className={`min-h-12 rounded-xl border px-3 text-sm font-semibold capitalize ${
+                    createdSort === value ? "border-primary bg-primary text-on-primary" : "border-outline-variant"
+                  }`}
+                  onClick={() => patch({ sort: value })}
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
+            <Link to="/periods" className="text-sm font-semibold text-secondary">
+              By period →
+            </Link>
+          </div>
         </div>
         {filtered.length === 0 ? (
           <div className="p-4">

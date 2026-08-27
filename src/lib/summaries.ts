@@ -55,3 +55,14 @@ export function periodTotals(period: BillingPeriod, transactions: Transaction[])
   const sums = sumTransactions(txns);
   return { period, count: txns.length, ...sums };
 }
+
+export type CreatedSort = "newest" | "oldest";
+
+export function sortTransactionsByCreated(transactions: Transaction[], sort: CreatedSort = "newest") {
+  const dir = sort === "oldest" ? 1 : -1;
+  return [...transactions].sort((a, b) => {
+    const created = a.created_at.localeCompare(b.created_at);
+    if (created) return created * dir;
+    return (a.txn_date ?? "").localeCompare(b.txn_date ?? "") * dir;
+  });
+}

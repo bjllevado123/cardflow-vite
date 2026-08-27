@@ -6,6 +6,7 @@ import { DashboardPage } from "@/pages/dashboard";
 import { CardsPage } from "@/pages/cards";
 import { CardDetailPage } from "@/pages/card-detail";
 import { TransactionsPage } from "@/pages/transactions";
+import { TransactionDetailPage } from "@/pages/transaction-detail";
 import { PeriodsPage } from "@/pages/periods";
 import { SettingsPage } from "@/pages/settings";
 import { AuthCallbackPage } from "@/pages/auth-callback";
@@ -102,7 +103,14 @@ const transactionsRoute = createRoute({
     q: typeof search.q === "string" ? search.q : undefined,
     card: typeof search.card === "string" ? search.card : undefined,
     period: typeof search.period === "string" ? search.period : undefined,
+    sort: search.sort === "oldest" ? ("oldest" as const) : undefined,
   }),
+});
+
+const transactionDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/transactions/$id",
+  component: TransactionDetailPage,
 });
 
 const periodsRoute = createRoute({
@@ -124,6 +132,7 @@ const routeTree = rootRoute.addChildren([
   cardsRoute,
   cardDetailRoute,
   transactionsRoute,
+  transactionDetailRoute,
   periodsRoute,
   settingsRoute,
 ]);

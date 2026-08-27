@@ -149,14 +149,19 @@ export function DashboardPage() {
         <div className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-6">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold">Recent activity</h3>
-            <Link to="/transactions" search={{ q: undefined, card: undefined, period: undefined }} className="text-sm font-semibold text-secondary">
+            <Link to="/transactions" search={{ q: undefined, card: undefined, period: undefined, sort: undefined }} className="text-sm font-semibold text-secondary">
               View all
             </Link>
           </div>
           {recent.map((t) => {
             const card = cards.find((c) => c.id === t.card_id);
             return (
-              <div key={t.id} className="flex items-center justify-between gap-3 rounded-xl px-3 py-3">
+              <Link
+                key={t.id}
+                to="/transactions/$id"
+                params={{ id: t.id }}
+                className="flex items-center justify-between gap-3 rounded-xl px-3 py-3 hover:bg-surface-container-high/30"
+              >
                 <div className="min-w-0">
                   <p className="truncate font-semibold">{t.notes || (t.type === "payment" ? "Payment" : "Charge")}</p>
                   <p className="truncate text-xs text-on-surface-variant">
@@ -168,7 +173,7 @@ export function DashboardPage() {
                   {t.type === "payment" ? "+" : "-"}
                   {formatPHP(Number(t.amount))}
                 </p>
-              </div>
+              </Link>
             );
           })}
         </div>

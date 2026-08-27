@@ -79,7 +79,7 @@ export function CardDetailPage() {
                 <h3 className="font-semibold">Activity</h3>
                 <p className="mt-0.5 text-xs text-on-surface-variant">All charges & payments on this card</p>
               </div>
-              <Link to="/transactions" search={{ q: undefined, card: card.id, period: "all" }} className="text-sm font-semibold text-secondary">
+              <Link to="/transactions" search={{ q: undefined, card: card.id, period: "all", sort: undefined }} className="text-sm font-semibold text-secondary">
                 In Transactions →
               </Link>
             </div>
