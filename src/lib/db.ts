@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable } from "dexie";
+import { roundMoney } from "./money";
 import { formatPeriodLabel } from "./recurrence";
 import type { BillingPeriod, Card, RecurrenceCadence, RecurringRule, Snapshot, SyncPayload, Transaction } from "./types";
 import { newId, todayIso } from "./utils";
@@ -313,7 +314,47 @@ export async function deleteTransaction(id: string) {
   emitChange();
 }
 
-export async function applyPendingDataFixes() {
+function cardHay(card: Card) {
+  return `${card.name} ${card.institution} ${card.color}`.toLowerCase();
+}
+
+function cardIsBrand(card: Card, brand: string) {
+  const hay = cardHay(card);
+  return card.color === brand || hay.includes(brand);
+}
+
+function findGcashCard(cards: Card[]) {
+  return (
+    cards.find((c) => cardIsBrand(c, "gcash") || cardHay(c).includes("g cash")) ??
+    cards.find((c) => /\bglobe\b/.test(cardHay(c)))
+  );
+}
+
+function isOpenRecurringNote(notes: string | null) {
+  return (notes ?? "").toLowerCase().includes("no end date");
+}
+
+function isOpenEnded(t: Transaction, rulesById: Map<string, RecurringRule>) {
+  if (isOpenRecurringNote(t.notes)) return true;
+  if (t.frequency !== "recurring" && !t.recurring_rule_id) return false;
+  const rule = t.recurring_rule_id ? rulesById.get(t.recurring_rule_id) : undefined;
+  if (rule) return !rule.end_date;
+  return t.frequency === "recurring";
+}
+
+function globeNote(notes: string | null) {
+  const current = (notes ?? "").trim();
+  if (!current || isOpenRecurringNote(current) || /^recurring\b/i.test(current)) return "Globe";
+  return current;
+}
+
+function txnDateIso(t: Transaction) {
+  if (t.txn_date && /^\d{4}-\d{2}-\d{2}/.test(t.txn_date)) return t.txn_date.slice(0, 10);
+  const fromPeriod = t.billing_period_id.replace(/^per_/, "");
+  return fromPeriod;
+}
+
+async function applyOneplus15Fix() {
   const dbx = getDb();
   const key = "fix_oneplus15_recurring_2027_08_30";
   const done = await dbx.meta.get(key);
@@ -329,6 +370,64 @@ export async function applyPendingDataFixes() {
   }
   await dbx.meta.put({ key, value: "1" });
   if (matches.length) emitChange();
+}
+
+async function applyBrianJuliusGlobeGcashFix(email?: string) {
+  if (email) {
+    const e = email.toLowerCase();
+    if (e.includes("stephanie") || e.includes("mariel") || e.startsWith("parents@")) return;
+  }
+  const dbx = getDb();
+  const key = "fix_bj_globe_gcash_999_1699";
+  const done = await dbx.meta.get(key);
+  if (done?.value === "1") return;
+
+  const [cards, transactions, rules] = await Promise.all([
+    dbx.cards.toArray(),
+    dbx.transactions.toArray(),
+    dbx.recurring.toArray(),
+  ]);
+  const gcash = findGcashCard(cards);
+  if (!gcash) return;
+  const byId = new Map(cards.map((c) => [c.id, c]));
+  const rulesById = new Map(rules.map((r) => [r.id, r]));
+  let changed = 0;
+
+  for (const t of transactions) {
+    if (t.type !== "charge") continue;
+    if (!isOpenEnded(t, rulesById)) continue;
+    const amount = roundMoney(Number(t.amount));
+    if (amount !== 999 && amount !== 1699) continue;
+    const card = byId.get(t.card_id);
+    if (!card) continue;
+    const move999 = amount === 999 && cardIsBrand(card, "bpi");
+    const move1699 = amount === 1699 && cardIsBrand(card, "bdo") && txnDateIso(t) >= "2026-08-30";
+    const nextCardId = move999 || move1699 ? gcash.id : t.card_id;
+    const nextNotes = globeNote(t.notes);
+    if (nextCardId === t.card_id && nextNotes === (t.notes ?? "").trim()) continue;
+    await dbx.transactions.update(t.id, { card_id: nextCardId, notes: nextNotes });
+    changed += 1;
+  }
+
+  for (const rule of rules) {
+    if (rule.type !== "charge" || rule.end_date) continue;
+    const amount = roundMoney(Number(rule.amount));
+    const card = byId.get(rule.card_id);
+    if (!card) continue;
+    const move999 = amount === 999 && cardIsBrand(card, "bpi");
+    const move1699 = amount === 1699 && cardIsBrand(card, "bdo");
+    if (!move999 && !move1699) continue;
+    await dbx.recurring.update(rule.id, { card_id: gcash.id, notes: globeNote(rule.notes) });
+    changed += 1;
+  }
+
+  await dbx.meta.put({ key, value: "1" });
+  if (changed) emitChange();
+}
+
+export async function applyPendingDataFixes(email?: string) {
+  await applyOneplus15Fix();
+  await applyBrianJuliusGlobeGcashFix(email);
 }
 
 export async function getDefaultPeriodFilter(): Promise<"all" | "closest_next"> {

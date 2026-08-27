@@ -20,7 +20,7 @@ export function UserDatabaseProvider({
     void (async () => {
       await openUserDatabase(userId);
       await startCloudSync(userId, email);
-      await applyPendingDataFixes();
+      await applyPendingDataFixes(email);
       if (cancelled) return;
       teardown = listenForCloudSync(userId);
       setReady(true);
