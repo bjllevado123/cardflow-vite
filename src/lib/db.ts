@@ -431,7 +431,7 @@ async function applyGlobe1699For2027Thirtieths(email?: string) {
     if (e.includes("stephanie") || e.includes("mariel") || e.startsWith("parents@")) return;
   }
   const dbx = getDb();
-  const key = "fix_bj_globe_1699_2027_30th";
+  const key = "fix_bj_globe_1699_2027_30th_feb28";
   const done = await dbx.meta.get(key);
   if (done?.value === "1") return;
 
@@ -444,7 +444,13 @@ async function applyGlobe1699For2027Thirtieths(email?: string) {
   const gcash = findGcashCard(cards);
   if (!gcash) return;
 
-  const thirtieths = periods.filter((p) => /^2027-\d{2}-30$/.test(p.period_date)).sort((a, b) => a.period_date.localeCompare(b.period_date));
+  const createdPeriods: BillingPeriod[] = [];
+  if (!periods.some((p) => p.period_date === "2027-02-28")) {
+    createdPeriods.push(periodRow("2027-02-28"));
+  }
+  const thirtieths = [...periods, ...createdPeriods]
+    .filter((p) => /^2027-\d{2}-30$/.test(p.period_date) || p.period_date === "2027-02-28")
+    .sort((a, b) => a.period_date.localeCompare(b.period_date));
   if (thirtieths.length === 0) {
     await dbx.meta.put({ key, value: "1" });
     return;
@@ -494,7 +500,8 @@ async function applyGlobe1699For2027Thirtieths(email?: string) {
     created_at: now,
   }));
 
-  await dbx.transaction("rw", dbx.transactions, dbx.recurring, dbx.meta, async () => {
+  await dbx.transaction("rw", dbx.periods, dbx.transactions, dbx.recurring, dbx.meta, async () => {
+    if (createdPeriods.length) await dbx.periods.bulkPut(createdPeriods);
     if (!rule) {
       rule = {
         id: newId("sub"),
