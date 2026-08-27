@@ -425,9 +425,105 @@ async function applyBrianJuliusGlobeGcashFix(email?: string) {
   if (changed) emitChange();
 }
 
+async function applyGlobe1699For2027Thirtieths(email?: string) {
+  if (email) {
+    const e = email.toLowerCase();
+    if (e.includes("stephanie") || e.includes("mariel") || e.startsWith("parents@")) return;
+  }
+  const dbx = getDb();
+  const key = "fix_bj_globe_1699_2027_30th";
+  const done = await dbx.meta.get(key);
+  if (done?.value === "1") return;
+
+  const [cards, periods, transactions, rules] = await Promise.all([
+    dbx.cards.toArray(),
+    dbx.periods.toArray(),
+    dbx.transactions.toArray(),
+    dbx.recurring.toArray(),
+  ]);
+  const gcash = findGcashCard(cards);
+  if (!gcash) return;
+
+  const thirtieths = periods.filter((p) => /^2027-\d{2}-30$/.test(p.period_date)).sort((a, b) => a.period_date.localeCompare(b.period_date));
+  if (thirtieths.length === 0) {
+    await dbx.meta.put({ key, value: "1" });
+    return;
+  }
+
+  const has1699OnPeriod = new Set(
+    transactions
+      .filter((t) => t.type === "charge" && roundMoney(Number(t.amount)) === 1699)
+      .map((t) => t.billing_period_id),
+  );
+  const missing = thirtieths.filter((p) => !has1699OnPeriod.has(p.id));
+  if (missing.length === 0) {
+    await dbx.meta.put({ key, value: "1" });
+    return;
+  }
+
+  const byId = new Map(cards.map((c) => [c.id, c]));
+  let rule =
+    rules.find(
+      (r) =>
+        r.type === "charge" &&
+        roundMoney(Number(r.amount)) === 1699 &&
+        r.card_id === gcash.id &&
+        (!r.end_date || isOpenRecurringNote(r.notes)),
+    ) ??
+    rules.find((r) => {
+      const card = byId.get(r.card_id);
+      return (
+        r.type === "charge" &&
+        roundMoney(Number(r.amount)) === 1699 &&
+        (!r.end_date || isOpenRecurringNote(r.notes)) &&
+        Boolean(card && (cardIsBrand(card, "gcash") || /\bglobe\b/.test(cardHay(card))))
+      );
+    });
+
+  const now = new Date().toISOString();
+  const created: Transaction[] = missing.map((period) => ({
+    id: newId("txn"),
+    card_id: gcash.id,
+    billing_period_id: period.id,
+    recurring_rule_id: rule?.id ?? null,
+    txn_date: period.period_date,
+    type: "charge" as const,
+    frequency: "recurring" as const,
+    amount: 1699,
+    notes: "Globe",
+    created_at: now,
+  }));
+
+  await dbx.transaction("rw", dbx.transactions, dbx.recurring, dbx.meta, async () => {
+    if (!rule) {
+      rule = {
+        id: newId("sub"),
+        card_id: gcash.id,
+        type: "charge",
+        amount: 1699,
+        notes: "Globe",
+        start_date: missing[0]!.period_date,
+        end_date: null,
+        cadence: "monthly",
+        occurrence_count: null,
+        active: true,
+        created_at: now,
+      };
+      await dbx.recurring.add(rule);
+      for (const row of created) row.recurring_rule_id = rule.id;
+    } else if (rule.card_id !== gcash.id) {
+      await dbx.recurring.update(rule.id, { card_id: gcash.id, notes: globeNote(rule.notes) });
+    }
+    await dbx.transactions.bulkAdd(created);
+    await dbx.meta.put({ key, value: "1" });
+  });
+  emitChange();
+}
+
 export async function applyPendingDataFixes(email?: string) {
   await applyOneplus15Fix();
   await applyBrianJuliusGlobeGcashFix(email);
+  await applyGlobe1699For2027Thirtieths(email);
 }
 
 export async function getDefaultPeriodFilter(): Promise<"all" | "closest_next"> {
