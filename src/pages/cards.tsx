@@ -35,7 +35,7 @@ export function CardsPage() {
           action={<AddCardButton holder={name} label="Add your first card" />}
         />
       ) : (
-        <section className="grid grid-cols-2 gap-3 md:grid-cols-2 md:gap-5 xl:grid-cols-3">
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3 xl:gap-5">
           {balances.map((b) => (
             <Link
               key={b.card.id}
@@ -50,10 +50,9 @@ export function CardsPage() {
                   lastFour={b.card.last_four}
                   balance={b.balance}
                   color={b.card.color}
-                  compact
                   className="max-w-none"
                 />
-                <span className="absolute right-2 top-2">
+                <span className="absolute right-2.5 top-2.5">
                   <CardStatusBadge balance={b.balance} onCard />
                 </span>
               </div>

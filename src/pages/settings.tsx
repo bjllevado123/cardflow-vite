@@ -26,8 +26,8 @@ export function SettingsPage() {
       <PageHeader title="Settings" description="Account, sync, and Transactions defaults for this device." />
       <section className="rounded-3xl border border-outline-variant/40 bg-surface-container-lowest p-5">
         <h2 className="font-semibold">Account</h2>
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <p className="text-sm">{user?.email ?? "Signed in"}</p>
+        <div className="mt-3 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="min-w-0 truncate text-sm">{user?.email ?? "Signed in"}</p>
           <SignOutButton />
         </div>
       </section>

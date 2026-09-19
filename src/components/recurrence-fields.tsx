@@ -6,7 +6,7 @@ import {
 } from "@/lib/recurrence";
 
 export const fieldClass =
-  "mt-1 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3 min-h-12 outline-none focus:border-primary";
+  "mt-1 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3 min-h-12 text-base outline-none focus:border-primary";
 
 export function RecurrenceFields({
   cadence,

@@ -40,16 +40,25 @@ export function PeriodsPage() {
               key={r.period.id}
               to="/transactions"
               search={{ q: undefined, card: undefined, period: r.period.id, sort: undefined }}
-              className="grid grid-cols-1 items-center gap-1 border-b border-outline-variant/40 px-5 py-4 last:border-0 hover:bg-surface-container-low/70 sm:grid-cols-12 sm:gap-3"
+              className="grid grid-cols-1 items-center gap-1 border-b border-outline-variant/40 px-4 py-4 last:border-0 hover:bg-surface-container-low/70 sm:grid-cols-12 sm:gap-3 sm:px-5"
             >
-              <div className="min-w-0 sm:col-span-5">
-                <p className="truncate font-semibold">{r.period.label}</p>
-                <p className="text-sm text-on-surface-variant">{format(parseISO(r.period.period_date), "MMM d, yyyy")}</p>
+              <div className="flex min-w-0 items-start justify-between gap-3 sm:col-span-5 sm:block">
+                <div className="min-w-0">
+                  <p className="truncate font-semibold">{r.period.label}</p>
+                  <p className="text-sm text-on-surface-variant">{format(parseISO(r.period.period_date), "MMM d, yyyy")}</p>
+                  <p className="mt-1 text-xs text-on-surface-variant sm:hidden">
+                    {r.count} · <span className="text-coral">{formatPHP(r.charges)}</span>
+                    {" in · "}
+                    <span className="text-secondary">{formatPHP(r.payments)}</span>
+                    {" out"}
+                  </p>
+                </div>
+                <p className="shrink-0 text-sm font-semibold tabular-nums sm:hidden">{formatPHP(r.balance)}</p>
               </div>
-              <p className="text-sm text-on-surface-variant sm:col-span-2 sm:text-right">{r.count}</p>
-              <p className="text-sm font-medium text-coral tabular-nums sm:col-span-2 sm:text-right">{formatPHP(r.charges)}</p>
-              <p className="text-sm font-medium text-secondary tabular-nums sm:col-span-2 sm:text-right">{formatPHP(r.payments)}</p>
-              <p className="text-sm font-semibold tabular-nums sm:col-span-1 sm:text-right">{formatPHP(r.balance)}</p>
+              <p className="hidden text-sm text-on-surface-variant sm:col-span-2 sm:block sm:text-right">{r.count}</p>
+              <p className="hidden text-sm font-medium text-coral tabular-nums sm:col-span-2 sm:block sm:text-right">{formatPHP(r.charges)}</p>
+              <p className="hidden text-sm font-medium text-secondary tabular-nums sm:col-span-2 sm:block sm:text-right">{formatPHP(r.payments)}</p>
+              <p className="hidden text-sm font-semibold tabular-nums sm:col-span-1 sm:block sm:text-right">{formatPHP(r.balance)}</p>
             </Link>
           ))}
         </section>

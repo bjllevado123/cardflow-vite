@@ -53,10 +53,10 @@ export function DashboardPage() {
         actions={<TransactionForm cards={cards} periods={periods} trigger="header" />}
       />
       <section className="grid grid-cols-1 gap-4 md:grid-cols-12 md:gap-6">
-        <div className="glass-panel flex min-h-[168px] flex-col justify-between rounded-2xl border border-outline-variant/30 p-6 md:col-span-8">
+        <div className="glass-panel flex min-h-[168px] flex-col justify-between rounded-2xl border border-outline-variant/30 p-4 md:col-span-8 md:p-6">
           <div>
             <p className="mb-1 text-sm text-on-surface-variant">Total balance</p>
-            <h2 className="text-4xl font-bold tracking-tight tabular-nums md:text-5xl">{formatPHP(totalBalance)}</h2>
+            <h2 className="text-[clamp(1.75rem,8vw,3rem)] font-bold tracking-tight break-words tabular-nums">{formatPHP(totalBalance)}</h2>
             <p className="mt-2 text-sm text-on-surface-variant">Goal: ₱0.00 across all cards</p>
           </div>
           <div className="mt-6 flex flex-wrap gap-6 text-sm">
@@ -74,7 +74,7 @@ export function DashboardPage() {
             </div>
           </div>
         </div>
-        <div className="glass-panel flex flex-col justify-between rounded-2xl border border-outline-variant/30 p-6 md:col-span-4">
+        <div className="glass-panel flex flex-col justify-between rounded-2xl border border-outline-variant/30 p-4 md:col-span-4 md:p-6">
           <div>
             <p className="mb-1 text-sm text-on-surface-variant">Utilization</p>
             <h3 className="text-3xl font-semibold">{utilization === null ? "—" : `${utilization}%`}</h3>
@@ -92,22 +92,22 @@ export function DashboardPage() {
       </section>
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2 md:gap-6">
-        <div className="flex flex-col rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-6">
+        <div className="flex flex-col rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-4 md:p-6">
           <div className="mb-5 flex items-center justify-between">
             <h3 className="text-lg font-semibold">Highest balance</h3>
             <Link to="/cards" className="text-sm font-semibold text-secondary">
               All cards
             </Link>
           </div>
-          <div className="flex min-h-[220px] flex-1 items-center justify-center">
+          <div className="flex min-h-0 flex-1 items-center justify-center md:min-h-[220px]">
             {featured ? (
-              <CardVisual name={featured.card.name} holder={name} lastFour={featured.card.last_four} balance={featured.balance} color={featured.card.color} className="max-w-[360px]" />
+              <CardVisual name={featured.card.name} holder={name} lastFour={featured.card.last_four} balance={featured.balance} color={featured.card.color} className="max-w-none md:max-w-[360px]" />
             ) : (
               <p className="text-sm text-on-surface-variant">Add a card to get started.</p>
             )}
           </div>
         </div>
-        <div className="flex flex-col rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-6">
+        <div className="flex flex-col rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-4 md:p-6">
           <div className="mb-5 flex items-center justify-between">
             <h3 className="text-lg font-semibold">Spend by period</h3>
             <span className="text-xs font-bold tracking-wide text-on-surface-variant uppercase">Charges</span>
@@ -115,7 +115,7 @@ export function DashboardPage() {
           {periodSpend.length === 0 ? (
             <p className="text-sm text-on-surface-variant">No billing periods yet.</p>
           ) : (
-            <div className="flex min-h-[180px] flex-1 items-end justify-around gap-2 border-b border-outline-variant pb-6">
+            <div className="flex min-h-[140px] flex-1 items-end justify-around gap-1 border-b border-outline-variant pb-6 sm:min-h-[180px] sm:gap-2">
               {periodSpend.map((p) => (
                 <div key={p.id} className="group flex max-w-[52px] flex-1 flex-col items-center gap-2" title={formatPHP(p.spend)}>
                   <div className="w-full rounded-t-md bg-secondary/85 progress-glow" style={{ height: `${Math.max(10, (p.spend / maxSpend) * 140)}px` }} />
@@ -128,7 +128,7 @@ export function DashboardPage() {
       </section>
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2 md:gap-6">
-        <div className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-6">
+        <div className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-4 md:p-6">
           <h3 className="mb-4 text-lg font-semibold">Open balances</h3>
           {upcoming.length === 0 ? (
             <p className="py-6 text-center text-sm text-on-surface-variant">All clear — every card is at ₱0.</p>
@@ -146,7 +146,7 @@ export function DashboardPage() {
             ))
           )}
         </div>
-        <div className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-6">
+        <div className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-4 md:p-6">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold">Recent activity</h3>
             <Link to="/transactions" search={{ q: undefined, card: undefined, period: undefined, sort: undefined }} className="text-sm font-semibold text-secondary">

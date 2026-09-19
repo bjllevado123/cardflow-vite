@@ -31,11 +31,11 @@ export function TransactionRow({
         to="/transactions/$id"
         params={{ id: txn.id }}
         aria-label={`${title}, ${card?.name ?? "card"}`}
-        className="flex min-w-0 flex-1 items-center justify-between p-4 md:p-6"
+        className="flex min-w-0 flex-1 items-center justify-between p-3.5 md:p-6"
       >
-        <div className="flex min-w-0 items-center gap-4">
+        <div className="flex min-w-0 items-center gap-3 md:gap-4">
           <div
-            className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full md:h-12 md:w-12 ${
               isPayment
                 ? "bg-secondary-container text-on-secondary-container"
                 : "bg-surface-container-high text-on-surface"
@@ -51,8 +51,8 @@ export function TransactionRow({
             </div>
           </div>
         </div>
-        <div className="shrink-0 pl-3 text-right">
-          <div className={`font-semibold tabular-nums ${isPayment ? "text-secondary" : "text-coral"}`}>
+        <div className="shrink-0 pl-2 text-right md:pl-3">
+          <div className={`text-sm font-semibold tabular-nums md:text-base ${isPayment ? "text-secondary" : "text-coral"}`}>
             {formatSignedPHP(Number(txn.amount), txn.type)}
           </div>
           {showDelete ? null : <div className="mt-1 text-sm text-on-surface-variant">{formatPHP(Number(txn.amount))}</div>}
@@ -61,7 +61,7 @@ export function TransactionRow({
       {showDelete ? (
         <button
           type="button"
-          className="shrink-0 self-center px-4 text-xs font-semibold text-on-surface-variant hover:text-error"
+          className="min-h-12 min-w-12 shrink-0 self-center px-3 text-xs font-semibold text-on-surface-variant hover:text-error"
           onClick={() => {
             void deleteTransaction(txn.id).then(() => toast.success("Entry deleted"));
           }}

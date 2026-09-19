@@ -6,7 +6,7 @@ import { addCard } from "@/lib/db";
 import { CARD_BRANDS, resolveCardBrand } from "@/lib/card-brands";
 
 const fieldClass =
-  "mt-1 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3 min-h-12 outline-none focus:border-primary";
+  "mt-1 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3 min-h-12 text-base outline-none focus:border-primary";
 
 export function AddCardButton({
   holder,
@@ -24,12 +24,12 @@ export function AddCardButton({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="group flex aspect-[1.586/1] min-h-0 flex-col items-center justify-center gap-3 rounded-[1.15rem] border-2 border-dashed border-outline-variant/80 bg-surface-container-lowest/50 p-4 text-center hover:border-secondary"
+          className="group flex aspect-[1.586/1] min-h-0 w-full flex-col items-center justify-center gap-2 rounded-[1.15rem] border-2 border-dashed border-outline-variant/80 bg-surface-container-lowest/50 p-4 text-center hover:border-secondary sm:gap-3"
         >
-          <span className="w-12 h-12 rounded-full bg-surface-container-high group-hover:bg-secondary-container flex items-center justify-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-container-high group-hover:bg-secondary-container">
             <span className="material-symbols-outlined text-[28px]">add</span>
           </span>
-          <p className="font-semibold">Add card or wallet</p>
+          <p className="text-sm font-semibold sm:text-base">Add card or wallet</p>
         </button>
         <AddCardModal open={open} onClose={() => setOpen(false)} holder={holder} />
       </>
@@ -40,7 +40,7 @@ export function AddCardButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="h-11 px-5 rounded-xl bg-primary text-on-primary font-semibold inline-flex items-center gap-2"
+        className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 font-semibold text-on-primary sm:w-auto"
       >
         <span className="material-symbols-outlined text-[20px]">add_card</span>
         {label}
@@ -86,12 +86,12 @@ function AddCardModal({ open, onClose, holder }: { open: boolean; onClose: () =>
                   setBrandId(b.id);
                   setName(b.label);
                 }}
-                className={`flex items-center gap-2.5 h-12 px-3 rounded-xl border text-sm font-semibold ${
+                className={`flex h-12 min-w-0 items-center gap-2 rounded-xl border px-2.5 text-xs font-semibold sm:gap-2.5 sm:px-3 sm:text-sm ${
                   brandId === b.id ? "border-primary bg-primary text-on-primary" : "border-outline-variant"
                 }`}
               >
-                <span className="w-3.5 h-3.5 rounded-full shrink-0" style={{ backgroundColor: b.swatch }} />
-                {b.label}
+                <span className="h-3.5 w-3.5 shrink-0 rounded-full" style={{ backgroundColor: b.swatch }} />
+                <span className="truncate">{b.label}</span>
               </button>
             ))}
           </div>
@@ -128,8 +128,8 @@ function AddCardModal({ open, onClose, holder }: { open: boolean; onClose: () =>
             </button>
           </form>
         </div>
-        <div className="order-1 md:order-2 flex flex-col items-center justify-center gap-3 rounded-2xl bg-surface-container-low/80 p-6">
-          <CardVisual name={name.trim() || brand.label} holder={holder} color={brandId} balance={0} />
+        <div className="order-1 flex flex-col items-center justify-center gap-3 rounded-2xl bg-surface-container-low/80 p-4 md:order-2 md:p-6">
+          <CardVisual name={name.trim() || brand.label} holder={holder} color={brandId} balance={0} className="max-w-none" />
         </div>
       </div>
     </Modal>

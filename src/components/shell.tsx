@@ -64,7 +64,7 @@ export function Shell() {
       </aside>
 
       <div className="flex min-h-dvh flex-col">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-outline-variant/40 bg-background/80 px-4 backdrop-blur-xl md:px-8">
+        <header className="sticky top-0 z-30 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between gap-3 border-b border-outline-variant/40 bg-background/80 px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[env(safe-area-inset-top)] backdrop-blur-xl md:h-16 md:px-8 md:pt-0">
           <div className="md:hidden">
             <BrandLogo size="sm" />
           </div>
@@ -73,13 +73,13 @@ export function Shell() {
           </div>
         </header>
         <UserMenuPopover name={name} email={user?.email} />
-        <main className="flex-1 px-4 pb-24 pt-5 md:px-10 md:pb-10">
-          <div className="mx-auto max-w-[1200px] space-y-8 animate-rise-delay-1 md:space-y-10">
+        <main className="flex-1 px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pb-[calc(6.75rem+env(safe-area-inset-bottom))] pt-5 md:px-10 md:pb-10">
+          <div className="mx-auto max-w-[1200px] space-y-6 animate-rise-delay-1 md:space-y-10">
             <Outlet />
           </div>
         </main>
         <nav className="fixed bottom-0 left-0 z-50 w-full pb-safe md:hidden">
-          <div className="mx-3 mb-3 rounded-2xl border border-outline-variant/40 bg-surface-container-lowest/95 backdrop-blur-xl">
+          <div className="mx-[max(0.75rem,env(safe-area-inset-left))] mr-[max(0.75rem,env(safe-area-inset-right))] mb-[max(0.75rem,env(safe-area-inset-bottom))] rounded-2xl border border-outline-variant/40 bg-surface-container-lowest/95 backdrop-blur-xl">
             <div className="flex h-[4.25rem] items-center justify-around">
               {links.map((item) => {
                 const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);

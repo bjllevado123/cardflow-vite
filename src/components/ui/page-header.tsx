@@ -8,14 +8,16 @@ export function PageHeader({
   actions?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <h2 className="md:hidden font-display text-2xl font-semibold tracking-[-0.03em] text-on-background">{title}</h2>
+        <h2 className="font-display text-balance text-2xl font-semibold tracking-[-0.03em] text-on-background md:hidden">
+          {title}
+        </h2>
         {description ? (
-          <p className="text-on-surface-variant mt-1.5 text-sm md:text-[0.95rem] max-w-xl leading-relaxed">{description}</p>
+          <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-on-surface-variant md:text-[0.95rem]">{description}</p>
         ) : null}
       </div>
-      {actions ? <div className="flex flex-wrap items-center gap-2 shrink-0">{actions}</div> : null}
+      {actions ? <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:shrink-0">{actions}</div> : null}
     </div>
   );
 }

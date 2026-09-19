@@ -47,7 +47,7 @@ export function CardDetailPage() {
       />
       <section className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start md:gap-6">
         <div className="lg:col-span-5 lg:sticky lg:top-24">
-          <div className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-5">
+          <div className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-4 md:p-5">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex min-w-0 items-center gap-2">
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: brand.swatch }} />
@@ -59,15 +59,15 @@ export function CardDetailPage() {
             <div className="mt-5 grid grid-cols-3 gap-2 text-center">
               <div className="rounded-xl bg-surface-container-low px-2 py-3">
                 <p className="text-[10px] font-bold tracking-wide text-on-surface-variant uppercase">Charges</p>
-                <p className="mt-1 text-sm font-semibold text-coral tabular-nums">{formatPHP(balance.charges)}</p>
+                <p className="mt-1 text-xs font-semibold text-coral tabular-nums sm:text-sm">{formatPHP(balance.charges)}</p>
               </div>
               <div className="rounded-xl bg-surface-container-low px-2 py-3">
                 <p className="text-[10px] font-bold tracking-wide text-on-surface-variant uppercase">Payments</p>
-                <p className="mt-1 text-sm font-semibold text-secondary tabular-nums">{formatPHP(balance.payments)}</p>
+                <p className="mt-1 text-xs font-semibold text-secondary tabular-nums sm:text-sm">{formatPHP(balance.payments)}</p>
               </div>
               <div className="rounded-xl bg-surface-container-low px-2 py-3">
                 <p className="text-[10px] font-bold tracking-wide text-on-surface-variant uppercase">Balance</p>
-                <p className="mt-1 text-sm font-semibold tabular-nums">{formatPHP(balance.balance)}</p>
+                <p className="mt-1 text-xs font-semibold tabular-nums sm:text-sm">{formatPHP(balance.balance)}</p>
               </div>
             </div>
           </div>

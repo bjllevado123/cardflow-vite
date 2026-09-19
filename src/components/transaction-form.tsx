@@ -202,7 +202,7 @@ export function TransactionForm({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 font-semibold text-on-primary hover:opacity-90"
+          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 font-semibold text-on-primary hover:opacity-90 sm:w-auto"
         >
           <span className="material-symbols-outlined text-[20px]">add</span>
           Add

@@ -69,7 +69,7 @@ export function TransactionsPage() {
             value={q}
             aria-label="Search notes or amount"
             placeholder="Search notes or amount…"
-            className="min-h-12 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 outline-none focus:border-primary md:col-span-5"
+            className="min-h-12 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-base outline-none focus:border-primary md:col-span-5"
             onChange={(e) => {
               const value = e.target.value;
               setQ(value);
@@ -78,7 +78,7 @@ export function TransactionsPage() {
           />
           <select
             value={cardId ?? ""}
-            className="min-h-12 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 md:col-span-3"
+            className="min-h-12 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-base md:col-span-3"
             onChange={(e) => patch({ card: e.target.value })}
           >
             <option value="">All cards</option>
@@ -90,7 +90,7 @@ export function TransactionsPage() {
           </select>
           <select
             value={search.period ?? "all"}
-            className="min-h-12 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 md:col-span-3"
+            className="min-h-12 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-base md:col-span-3"
             onChange={(e) => patch({ period: e.target.value })}
           >
             <option value="all">All periods</option>

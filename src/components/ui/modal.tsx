@@ -89,13 +89,13 @@ export function Modal({
           <Drawer.Overlay className="fixed inset-0 z-[70] bg-primary/40 backdrop-blur-sm" />
           <Drawer.Content
             aria-labelledby={titleId}
-            className="fixed right-0 bottom-0 left-0 z-[71] flex max-h-[92vh] flex-col rounded-t-3xl bg-surface-container-lowest outline-none"
+            className="fixed right-0 bottom-0 left-0 z-[71] flex max-h-[min(92dvh,92vh)] flex-col rounded-t-3xl bg-surface-container-lowest outline-none"
           >
             <div className="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-outline-variant" />
             <Header title={title} description={description} titleId={titleId} descId={descId} onClose={onClose} />
             <div
               data-vaul-no-drag
-              className="min-h-0 flex-1 touch-pan-y overflow-y-auto overscroll-contain px-6 pt-2 pb-8"
+              className="min-h-0 flex-1 touch-pan-y overflow-y-auto overscroll-contain px-4 pt-2 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6"
             >
               {children}
             </div>
