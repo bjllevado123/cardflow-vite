@@ -22,13 +22,13 @@ export function RecurrenceFields({
   showStartDate = true,
 }: {
   cadence: RecurrenceCadence;
-  count: number;
+  count: number | null;
   startDate: string;
   dayOfMonth: number;
   previewDates: string[];
   missingCount?: number;
   onCadenceChange: (value: RecurrenceCadence) => void;
-  onCountChange: (value: number) => void;
+  onCountChange: (value: number | null) => void;
   onStartDateChange?: (value: string) => void;
   onDayOfMonthChange?: (value: number) => void;
   showStartDate?: boolean;
@@ -79,12 +79,22 @@ export function RecurrenceFields({
       <label className="block">
         <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">{countLabel}</span>
         <input
+          name="occurrence_count"
           type="number"
           min={1}
           max={60}
-          value={count}
+          required
+          value={count ?? ""}
           className={fieldClass}
-          onChange={(e) => onCountChange(Number(e.target.value) || 1)}
+          onChange={(e) => {
+            const raw = e.target.value;
+            if (raw === "") {
+              onCountChange(null);
+              return;
+            }
+            const next = Number(raw);
+            onCountChange(Number.isFinite(next) ? next : null);
+          }}
         />
       </label>
       {previewDates.length > 0 ? (

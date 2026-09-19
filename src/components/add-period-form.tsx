@@ -11,12 +11,13 @@ export function AddPeriodButton() {
   const [open, setOpen] = useState(false);
   const [repeat, setRepeat] = useState(false);
   const [cadence, setCadence] = useState<RecurrenceCadence>("monthly");
-  const [count, setCount] = useState(6);
+  const [count, setCount] = useState<number | null>(3);
+  const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState(todayIso);
   const [dayOfMonth, setDayOfMonth] = useState(() => Number(todayIso().slice(8, 10)));
 
   const previewDates = useMemo(
-    () => (repeat ? generateOccurrenceDates({ cadence, startDate, count, dayOfMonth }) : []),
+    () => (repeat && count != null && count >= 1 ? generateOccurrenceDates({ cadence, startDate, count, dayOfMonth }) : []),
     [repeat, cadence, startDate, count, dayOfMonth],
   );
 
@@ -24,7 +25,8 @@ export function AddPeriodButton() {
     setOpen(false);
     setRepeat(false);
     setCadence("monthly");
-    setCount(6);
+    setCount(3);
+    setError(null);
     setStartDate(todayIso());
     setDayOfMonth(Number(todayIso().slice(8, 10)));
   }
@@ -55,6 +57,10 @@ export function AddPeriodButton() {
             e.preventDefault();
             void (async () => {
               if (repeat) {
+                if (count == null || count < 1) {
+                  setError("Enter how many months");
+                  return;
+                }
                 const dates = generateOccurrenceDates({ cadence, startDate, count, dayOfMonth });
                 if (dates.length === 0) return;
                 const { created, skipped } = await addPeriods(dates);
@@ -114,6 +120,11 @@ export function AddPeriodButton() {
               </label>
             </>
           )}
+          {error ? (
+            <p className="text-sm text-error" role="alert">
+              {error}
+            </p>
+          ) : null}
           <button type="submit" className="h-12 w-full rounded-xl bg-primary font-semibold text-on-primary">
             {repeat ? "Create periods" : "Create period"}
           </button>

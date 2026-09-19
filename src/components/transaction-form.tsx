@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { RecurrenceFields, fieldClass } from "@/components/recurrence-fields";
 import { Modal } from "@/components/ui/modal";
-import { addRecurringSeries, addTransaction, deleteTransaction, undoRecurringSeries } from "@/lib/db";
+import { addRecurringSeries, addTransaction, deleteTransaction, undoRecurringSeries, updateTransaction } from "@/lib/db";
 import { formatDateList, generateOccurrenceDates, matchPeriodsForDates } from "@/lib/recurrence";
-import type { BillingPeriod, Card, RecurrenceCadence } from "@/lib/types";
+import type { BillingPeriod, Card, RecurrenceCadence, Transaction } from "@/lib/types";
 import { parseMoneyInput } from "@/lib/money";
 import { todayIso } from "@/lib/utils";
 
@@ -15,22 +15,27 @@ export function TransactionForm({
   trigger = "header",
   defaultCardId,
   defaultPeriodId,
+  txn,
+  onSaved,
 }: {
   cards: Card[];
   periods: BillingPeriod[];
   defaultOpen?: boolean;
-  trigger?: "header" | "none";
+  trigger?: "header" | "none" | "edit";
   defaultCardId?: string;
   defaultPeriodId?: string;
+  txn?: Transaction;
+  onSaved?: () => void;
 }) {
+  const editing = Boolean(txn);
   const [open, setOpen] = useState(defaultOpen);
-  const [type, setType] = useState<"charge" | "payment">("charge");
+  const [type, setType] = useState<"charge" | "payment">(txn?.type ?? "charge");
   const [error, setError] = useState<string | null>(null);
-  const [recurring, setRecurring] = useState(false);
+  const [recurring, setRecurring] = useState(txn?.frequency === "recurring");
   const [cadence, setCadence] = useState<RecurrenceCadence>("monthly");
-  const [count, setCount] = useState(6);
-  const [txnDate, setTxnDate] = useState(todayIso);
-  const [dayOfMonth, setDayOfMonth] = useState(() => Number(todayIso().slice(8, 10)));
+  const [count, setCount] = useState<number | null>(3);
+  const [txnDate, setTxnDate] = useState(txn?.txn_date ?? todayIso);
+  const [dayOfMonth, setDayOfMonth] = useState(() => Number((txn?.txn_date ?? todayIso()).slice(8, 10)));
   const [pending, setPending] = useState<{
     amount: number;
     card_id: string;
@@ -41,17 +46,31 @@ export function TransactionForm({
 
   const newestPeriod = [...periods].sort((a, b) => b.period_date.localeCompare(a.period_date))[0];
   const previewDates = useMemo(
-    () => (recurring ? generateOccurrenceDates({ cadence, startDate: txnDate, count, dayOfMonth }) : []),
-    [recurring, cadence, txnDate, count, dayOfMonth],
+    () =>
+      recurring && !editing && count != null && count >= 1
+        ? generateOccurrenceDates({ cadence, startDate: txnDate, count, dayOfMonth })
+        : [],
+    [recurring, editing, cadence, txnDate, count, dayOfMonth],
   );
   const previewMatch = useMemo(() => matchPeriodsForDates(previewDates, periods), [previewDates, periods]);
+
+  useEffect(() => {
+    if (!open || !txn) return;
+    setType(txn.type);
+    setRecurring(txn.frequency === "recurring");
+    setTxnDate(txn.txn_date ?? todayIso());
+    const day = Number((txn.txn_date ?? "").slice(8, 10));
+    if (day) setDayOfMonth(day);
+    setError(null);
+    setPending(null);
+  }, [open, txn]);
 
   function resetForm() {
     setError(null);
     setPending(null);
     setRecurring(false);
     setCadence("monthly");
-    setCount(6);
+    setCount(3);
     setTxnDate(todayIso());
     setDayOfMonth(Number(todayIso().slice(8, 10)));
   }
@@ -65,6 +84,10 @@ export function TransactionForm({
     input: { amount: number; card_id: string; notes: string; dates: string[] },
     createMissingPeriods: boolean,
   ) {
+    if (count == null || count < 1) {
+      setError("Enter how many months");
+      return;
+    }
     try {
       const result = await addRecurringSeries({
         card_id: input.card_id,
@@ -107,7 +130,32 @@ export function TransactionForm({
       return;
     }
 
+    if (editing && txn) {
+      const billing_period_id = String(fd.get("billing_period_id") ?? txn.billing_period_id);
+      if (!billing_period_id) {
+        setError("Pick a card, period, and amount greater than 0");
+        return;
+      }
+      await updateTransaction(txn.id, {
+        card_id,
+        billing_period_id,
+        type,
+        amount,
+        notes,
+        frequency: recurring ? "recurring" : "one_time",
+        txn_date: txnDate,
+      });
+      toast.success("Transaction updated");
+      onSaved?.();
+      close();
+      return;
+    }
+
     if (recurring) {
+      if (count == null || count < 1) {
+        setError("Enter how many months");
+        return;
+      }
       const dates = generateOccurrenceDates({ cadence, startDate: txnDate, count, dayOfMonth });
       if (dates.length === 0) {
         setError("Choose a start date and how many times this should repeat");
@@ -158,16 +206,35 @@ export function TransactionForm({
           Add
         </button>
       ) : null}
+      {trigger === "edit" ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="min-h-12 w-full rounded-xl bg-primary font-semibold text-on-primary"
+        >
+          Edit
+        </button>
+      ) : null}
       <Modal
         open={open}
         onClose={close}
-        title={pending ? "Missing billing periods" : recurring ? "Add recurring transaction" : "Add transaction"}
+        title={
+          pending
+            ? "Missing billing periods"
+            : editing
+              ? "Edit transaction"
+              : recurring
+                ? "Add recurring transaction"
+                : "Add transaction"
+        }
         description={
           pending
             ? "Some dates in this series do not have a billing period yet."
-            : recurring
-              ? "This will create one entry per date. If a billing period is missing, you can create it or skip it."
-              : "Log a one-time charge or payment, or switch to Recurring for a series."
+            : editing
+              ? "Changes apply to this entry only."
+              : recurring
+                ? "This will create one entry per date. If a billing period is missing, you can create it or skip it."
+                : "Log a one-time charge or payment, or switch to Recurring for a series."
         }
         wide
       >
@@ -208,6 +275,7 @@ export function TransactionForm({
           <p className="text-sm text-on-surface-variant">Add at least one card first.</p>
         ) : (
           <form
+            key={txn?.id ?? "create"}
             className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
@@ -251,7 +319,7 @@ export function TransactionForm({
                 </button>
               </div>
             </div>
-            {recurring ? (
+            {recurring && !editing ? (
               <RecurrenceFields
                 cadence={cadence}
                 count={count}
@@ -282,6 +350,7 @@ export function TransactionForm({
                 aria-describedby={error ? "txn-amount-error" : undefined}
                 className={fieldClass}
                 placeholder="0.00"
+                defaultValue={txn ? String(txn.amount) : undefined}
                 onPaste={(e) => {
                   const parsed = parseMoneyInput(e.clipboardData.getData("text"));
                   if (!(parsed > 0)) return;
@@ -296,7 +365,7 @@ export function TransactionForm({
             </label>
             <label className="block">
               <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">Card</span>
-              <select name="card_id" defaultValue={defaultCardId ?? cards[0]?.id} className={fieldClass}>
+              <select name="card_id" defaultValue={txn?.card_id ?? defaultCardId ?? cards[0]?.id} className={fieldClass}>
                 {cards.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -304,10 +373,10 @@ export function TransactionForm({
                 ))}
               </select>
             </label>
-            {recurring ? null : (
+            {recurring && !editing ? null : (
               <label className="block">
                 <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">Period</span>
-                <select name="billing_period_id" defaultValue={defaultPeriodId ?? newestPeriod?.id} className={fieldClass}>
+                <select name="billing_period_id" defaultValue={txn?.billing_period_id ?? defaultPeriodId ?? newestPeriod?.id} className={fieldClass}>
                   {periods.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.label}
@@ -316,7 +385,7 @@ export function TransactionForm({
                 </select>
               </label>
             )}
-            {recurring ? null : (
+            {recurring && !editing ? null : (
               <label className="block">
                 <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">Date</span>
                 <input
@@ -334,7 +403,7 @@ export function TransactionForm({
             )}
             <label className="block">
               <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">Note</span>
-              <input name="notes" className={fieldClass} placeholder="e.g. Shell Catarman" />
+              <input name="notes" className={fieldClass} placeholder="e.g. Shell Catarman" defaultValue={txn?.notes ?? ""} />
             </label>
             {error ? (
               <p id="txn-amount-error" className="text-sm text-error" role="alert">
@@ -342,7 +411,7 @@ export function TransactionForm({
               </p>
             ) : null}
             <button type="submit" className="h-12 w-full rounded-xl bg-primary font-semibold text-on-primary">
-              {recurring ? "Save recurring series" : "Save"}
+              {editing ? "Save changes" : recurring ? "Save recurring series" : "Save"}
             </button>
           </form>
         )}

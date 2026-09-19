@@ -228,6 +228,15 @@ export async function addTransaction(input: {
   return row;
 }
 
+export async function updateTransaction(
+  id: string,
+  patch: Partial<Pick<Transaction, "card_id" | "billing_period_id" | "type" | "amount" | "notes" | "frequency" | "txn_date">>,
+) {
+  const notes = patch.notes !== undefined ? patch.notes?.trim() || null : undefined;
+  await getDb().transactions.update(id, notes !== undefined ? { ...patch, notes } : patch);
+  emitChange();
+}
+
 export async function addRecurringSeries(input: {
   card_id: string;
   type: Transaction["type"];

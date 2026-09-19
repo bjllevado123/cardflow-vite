@@ -2,6 +2,7 @@ import { Link, useNavigate, useParams } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
+import { TransactionForm } from "@/components/transaction-form";
 import { PageHeader } from "@/components/ui/page-header";
 import { db, deleteTransaction } from "@/lib/db";
 import { formatSignedPHP } from "@/lib/money";
@@ -27,6 +28,8 @@ export function TransactionDetailPage() {
   const { id } = useParams({ from: "/transactions/$id" });
   const navigate = useNavigate();
   const txn = useLiveQuery(async () => (await db.transactions.get(id)) ?? null, [id]);
+  const cards = useLiveQuery(() => db.cards.toArray()) ?? [];
+  const periods = useLiveQuery(() => db.periods.orderBy("period_date").reverse().toArray()) ?? [];
   const card = useLiveQuery(() => (txn ? db.cards.get(txn.card_id) : undefined), [txn?.card_id]);
   const period = useLiveQuery(() => (txn ? db.periods.get(txn.billing_period_id) : undefined), [txn?.billing_period_id]);
 
@@ -108,6 +111,7 @@ export function TransactionDetailPage() {
           {txn.notes ? <DetailRow label="Note">{txn.notes}</DetailRow> : null}
         </dl>
       </section>
+      <TransactionForm cards={cards} periods={periods} txn={txn} trigger="edit" />
       <button
         type="button"
         className="min-h-12 w-full rounded-xl border border-outline-variant text-sm font-semibold text-error"
