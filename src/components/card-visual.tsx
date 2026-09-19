@@ -66,14 +66,14 @@ export function CardVisual({
         )}
       >
         <div className="plastic-card-sheen pointer-events-none absolute inset-0" />
-        <div className="plastic-card-glass pointer-events-none absolute top-0 left-[-8%] h-1/2 w-[120%]" />
-        <div className="plastic-card-texture pointer-events-none absolute inset-0 opacity-80" />
-        <div className="pointer-events-none absolute -right-8 -bottom-10 h-36 w-36 rounded-full bg-white/28" />
-        <div className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/45" />
+        <div className="plastic-card-glass pointer-events-none absolute top-0 left-[-8%] h-[38%] w-[120%]" />
+        <div className="plastic-card-texture pointer-events-none absolute inset-0 opacity-50" />
+        <div className="pointer-events-none absolute -right-8 -bottom-10 h-36 w-36 rounded-full bg-white/[0.08]" />
+        <div className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/18" />
 
         <div className="relative z-10 flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2 @[18rem]:gap-2.5">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white/18 text-xs font-bold tracking-tight shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] ring-1 ring-white/25 @[18rem]:h-8 @[18rem]:w-8 @[18rem]:rounded-xl @[18rem]:text-sm @[24rem]:h-10 @[24rem]:w-10 @[24rem]:text-base">
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-black/20 text-xs font-bold tracking-tight shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] ring-1 ring-white/15 @[18rem]:h-8 @[18rem]:w-8 @[18rem]:rounded-xl @[18rem]:text-sm @[24rem]:h-10 @[24rem]:w-10 @[24rem]:text-base">
               {mark}
             </span>
             <span className="truncate text-sm font-semibold tracking-[0.08em] @[24rem]:text-base">{name}</span>
