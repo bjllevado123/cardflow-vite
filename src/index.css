@@ -89,20 +89,20 @@ body {
 
 .plastic-card {
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.42),
-    inset 0 -28px 42px rgba(0, 0, 0, 0.28),
-    0 18px 36px -14px rgba(15, 23, 42, 0.55);
+    inset 0 1px 0 rgba(255, 255, 255, 0.62),
+    inset 0 -18px 28px rgba(255, 255, 255, 0.12),
+    0 18px 36px -14px rgba(15, 23, 42, 0.28);
 }
 
 .plastic-card-sheen {
   background:
-    linear-gradient(118deg, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.1) 30%, transparent 52%),
-    radial-gradient(120% 80% at 0% 0%, rgba(255, 255, 255, 0.24), transparent 54%),
-    radial-gradient(80% 70% at 100% 110%, rgba(0, 0, 0, 0.38), transparent 52%);
+    linear-gradient(118deg, rgba(255, 255, 255, 0.58) 0%, rgba(255, 255, 255, 0.22) 34%, transparent 58%),
+    radial-gradient(120% 80% at 0% 0%, rgba(255, 255, 255, 0.42), transparent 54%),
+    radial-gradient(80% 70% at 100% 110%, rgba(255, 255, 255, 0.16), transparent 52%);
 }
 
 .plastic-card-glass {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.28);
   transform: skewY(-8deg);
   transform-origin: top left;
 }
@@ -110,7 +110,7 @@ body {
 .plastic-card-texture {
   background-image: repeating-linear-gradient(
     125deg,
-    rgba(255, 255, 255, 0.055) 0 1px,
+    rgba(255, 255, 255, 0.1) 0 1px,
     transparent 1px 9px
   );
 }

@@ -68,8 +68,8 @@ export function CardVisual({
         <div className="plastic-card-sheen pointer-events-none absolute inset-0" />
         <div className="plastic-card-glass pointer-events-none absolute top-0 left-[-8%] h-1/2 w-[120%]" />
         <div className="plastic-card-texture pointer-events-none absolute inset-0 opacity-80" />
-        <div className="pointer-events-none absolute -right-8 -bottom-10 h-36 w-36 rounded-full bg-white/15" />
-        <div className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/30" />
+        <div className="pointer-events-none absolute -right-8 -bottom-10 h-36 w-36 rounded-full bg-white/28" />
+        <div className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/45" />
 
         <div className="relative z-10 flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2 @[18rem]:gap-2.5">
