@@ -101,7 +101,7 @@ export function DashboardPage() {
           </div>
           <div className="flex min-h-[220px] flex-1 items-center justify-center">
             {featured ? (
-              <CardVisual name={featured.card.name} holder={name} lastFour={featured.card.last_four} balance={featured.balance} color={featured.card.color} />
+              <CardVisual name={featured.card.name} holder={name} lastFour={featured.card.last_four} balance={featured.balance} color={featured.card.color} className="max-w-[360px]" />
             ) : (
               <p className="text-sm text-on-surface-variant">Add a card to get started.</p>
             )}

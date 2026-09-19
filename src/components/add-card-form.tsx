@@ -24,7 +24,7 @@ export function AddCardButton({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="group min-h-[220px] rounded-2xl border-2 border-dashed border-outline-variant/80 bg-surface-container-lowest/50 hover:border-secondary flex flex-col items-center justify-center gap-3 p-6 text-center"
+          className="group flex aspect-[1.586/1] min-h-0 flex-col items-center justify-center gap-3 rounded-[1.15rem] border-2 border-dashed border-outline-variant/80 bg-surface-container-lowest/50 p-4 text-center hover:border-secondary"
         >
           <span className="w-12 h-12 rounded-full bg-surface-container-high group-hover:bg-secondary-container flex items-center justify-center">
             <span className="material-symbols-outlined text-[28px]">add</span>

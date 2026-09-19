@@ -55,7 +55,7 @@ export function CardDetailPage() {
               </div>
               <CardStatusBadge balance={balance.balance} />
             </div>
-            <CardVisual name={card.name} holder={name} lastFour={card.last_four} balance={balance.balance} color={card.color} />
+            <CardVisual name={card.name} holder={name} lastFour={card.last_four} balance={balance.balance} color={card.color} className="max-w-none" />
             <div className="mt-5 grid grid-cols-3 gap-2 text-center">
               <div className="rounded-xl bg-surface-container-low px-2 py-3">
                 <p className="text-[10px] font-bold tracking-wide text-on-surface-variant uppercase">Charges</p>
