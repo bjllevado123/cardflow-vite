@@ -11,10 +11,10 @@ export const CARD_BRANDS: CardBrand[] = [
   { id: "bdo", label: "BDO", gradient: "from-[#00153d] via-[#003DA5] to-[#2f7de1]", swatch: "#003DA5", keywords: ["bdo"] },
   { id: "gcash", label: "GCash", gradient: "from-[#001a7a] via-[#0052e0] to-[#3aa0ff]", swatch: "#007CFF", keywords: ["gcash", "g cash"] },
   { id: "gotyme", label: "GoTyme", gradient: "from-[#070b12] via-[#12243f] to-[#3a7ad4]", swatch: "#2B6CB0", keywords: ["gotyme", "go tyme", "tyme"] },
+  { id: "shopee", label: "Shopee", gradient: "from-[#9a2410] via-[#EE4D2D] to-[#ff8a62]", swatch: "#EE4D2D", keywords: ["shopee"] },
   { id: "landbank", label: "Landbank", gradient: "from-[#06351c] via-[#0b6b36] to-[#1db954]", swatch: "#0b6b36", keywords: ["landbank", "lbp"] },
   { id: "unionbank", label: "UnionBank", gradient: "from-[#9a3400] via-[#ef6a00] to-[#ffb25a]", swatch: "#ef6a00", keywords: ["unionbank", "ubp", "maribank"] },
   { id: "metrobank", label: "Metrobank", gradient: "from-[#1a2744] via-[#243868] to-[#f0c14b]", swatch: "#243868", keywords: ["metrobank"] },
-  { id: "shopee", label: "Shopee", gradient: "from-[#9a2410] via-[#EE4D2D] to-[#ff8a62]", swatch: "#EE4D2D", keywords: ["shopee"] },
   { id: "maya", label: "Maya", gradient: "from-[#04352c] via-[#00A67E] to-[#5ee0b8]", swatch: "#00A67E", keywords: ["maya", "paymaya"] },
   { id: "others", label: "Others", gradient: "from-[#111827] via-[#334155] to-[#94a3b8]", swatch: "#475569", keywords: ["others", "other", "cash"] },
 ];
@@ -36,4 +36,32 @@ export function resolveCardBrandFromCard(name: string, color?: string | null): C
   if (byKeyword) return byKeyword;
   if (color) return resolveCardBrand(color);
   return FALLBACK;
+}
+
+function namedBrandIndex(name: string, color?: string | null): number {
+  const brand = resolveCardBrandFromCard(name, color);
+  return CARD_BRANDS.findIndex((b) => b.id === brand.id);
+}
+
+/** The catch-all Others wallet — not every unmatched custom name. */
+export function isOthersCard(name: string, color?: string | null): boolean {
+  const key = name.trim().toLowerCase();
+  const known = CARD_BRANDS.find(
+    (b) => b.id !== "others" && b.keywords.some((k) => key === k || key.includes(k)),
+  );
+  if (known) return false;
+  return key === "others" || key === "other" || color === "others";
+}
+
+export function sortCards<T extends { name: string; color?: string | null; sort_order?: number }>(cards: T[]): T[] {
+  return [...cards].sort((a, b) => {
+    const aLast = isOthersCard(a.name, a.color);
+    const bLast = isOthersCard(b.name, b.color);
+    if (aLast !== bLast) return aLast ? 1 : -1;
+    const rank = namedBrandIndex(a.name, a.color) - namedBrandIndex(b.name, b.color);
+    if (rank) return rank;
+    const order = (a.sort_order ?? 0) - (b.sort_order ?? 0);
+    if (order) return order;
+    return a.name.localeCompare(b.name);
+  });
 }

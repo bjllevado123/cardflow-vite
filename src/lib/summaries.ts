@@ -1,3 +1,4 @@
+import { sortCards } from "./card-brands";
 import type { BillingPeriod, Card, Transaction } from "./types";
 import { amountMatchesQuery, roundMoney } from "./money";
 
@@ -10,7 +11,7 @@ export function computeBalances(cards: Card[], transactions: Pick<Transaction, "
     else if (t.type === "payment") row.payments += amount;
     byCard.set(t.card_id, row);
   }
-  return cards.map((card) => {
+  return sortCards(cards).map((card) => {
     const row = byCard.get(card.id) ?? { charges: 0, payments: 0 };
     const charges = roundMoney(row.charges);
     const payments = roundMoney(row.payments);

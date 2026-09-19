@@ -54,7 +54,7 @@ export function CardsPage() {
                   className="max-w-none"
                 />
                 <span className="absolute right-2 top-2">
-                  <CardStatusBadge balance={b.balance} />
+                  <CardStatusBadge balance={b.balance} onCard />
                 </span>
               </div>
               <p className="mt-2 truncate text-[11px] text-on-surface-variant">

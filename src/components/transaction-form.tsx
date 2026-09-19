@@ -6,6 +6,7 @@ import { addRecurringSeries, addTransaction, deleteTransaction, undoRecurringSer
 import { formatDateList, generateOccurrenceDates, matchPeriodsForDates } from "@/lib/recurrence";
 import type { BillingPeriod, Card, RecurrenceCadence, Transaction } from "@/lib/types";
 import { parseMoneyInput } from "@/lib/money";
+import { sortCards } from "@/lib/card-brands";
 import { todayIso } from "@/lib/utils";
 
 export function TransactionForm({
@@ -44,6 +45,7 @@ export function TransactionForm({
     missing: string[];
   } | null>(null);
 
+  const orderedCards = useMemo(() => sortCards(cards), [cards]);
   const newestPeriod = [...periods].sort((a, b) => b.period_date.localeCompare(a.period_date))[0];
   const previewDates = useMemo(
     () =>
@@ -271,7 +273,7 @@ export function TransactionForm({
               Back
             </button>
           </div>
-        ) : cards.length === 0 ? (
+        ) : orderedCards.length === 0 ? (
           <p className="text-sm text-on-surface-variant">Add at least one card first.</p>
         ) : (
           <form
@@ -365,8 +367,8 @@ export function TransactionForm({
             </label>
             <label className="block">
               <span className="text-[12px] font-bold tracking-[0.08em] text-on-surface-variant uppercase">Card</span>
-              <select name="card_id" defaultValue={txn?.card_id ?? defaultCardId ?? cards[0]?.id} className={fieldClass}>
-                {cards.map((c) => (
+              <select name="card_id" defaultValue={txn?.card_id ?? defaultCardId ?? orderedCards[0]?.id} className={fieldClass}>
+                {orderedCards.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
                   </option>

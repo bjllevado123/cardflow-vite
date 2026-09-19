@@ -7,15 +7,16 @@ function Chip({ compact }: { compact?: boolean }) {
     <div
       aria-hidden
       className={cn(
-        "relative overflow-hidden rounded-md bg-gradient-to-br from-[#f4e2b0] via-[#d4a84b] to-[#8a6a22] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]",
-        compact ? "h-6 w-8" : "h-8 w-10",
+        "relative overflow-hidden rounded-[0.35rem] bg-gradient-to-br from-[#f7e7b8] via-[#d4a84b] to-[#8a6a22] shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_1px_2px_rgba(0,0,0,0.25)]",
+        compact ? "h-7 w-9" : "h-9 w-11",
       )}
     >
-      <div className="absolute inset-[3px] grid grid-cols-3 grid-rows-2 gap-px opacity-35">
+      <div className="absolute inset-[3px] grid grid-cols-3 grid-rows-2 gap-px opacity-40">
         {Array.from({ length: 6 }, (_, i) => (
           <span key={i} className="bg-[#5c4310]" />
         ))}
       </div>
+      <div className="absolute inset-x-0 top-0 h-1/2 bg-white/25" />
     </div>
   );
 }
@@ -25,7 +26,7 @@ function Contactless({ compact }: { compact?: boolean }) {
     <svg
       aria-hidden
       viewBox="0 0 24 24"
-      className={cn("text-white/80", compact ? "h-5 w-5" : "h-6 w-6")}
+      className={cn("text-white/85 drop-shadow-sm", compact ? "h-5 w-5" : "h-6 w-6")}
       fill="none"
       stroke="currentColor"
       strokeWidth="1.6"
@@ -61,42 +62,43 @@ export function CardVisual({
   return (
     <div
       className={cn(
-        "relative isolate flex aspect-[1.586/1] w-full flex-col justify-between overflow-hidden text-white",
-        compact ? "max-w-[300px] rounded-[1.15rem] p-3.5" : "max-w-[360px] rounded-[1.4rem] p-5",
+        "plastic-card relative isolate flex aspect-[1.586/1] w-full flex-col justify-between overflow-hidden text-white",
+        compact ? "max-w-[300px] rounded-[1.25rem] p-4" : "max-w-[360px] rounded-[1.5rem] p-6",
         `bg-gradient-to-br ${brand.gradient}`,
-        "shadow-[0_20px_36px_-16px_rgba(15,23,42,0.55)]",
         className,
       )}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_0%_0%,rgba(255,255,255,0.26),transparent_46%),radial-gradient(90%_70%_at_100%_120%,rgba(0,0,0,0.28),transparent_48%)]" />
-      <div className="pointer-events-none absolute -right-10 top-4 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
-      <div className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/25" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-white/10 to-transparent" />
+      <div className="plastic-card-sheen pointer-events-none absolute inset-0" />
+      <div className="plastic-card-glass pointer-events-none absolute top-0 left-[-8%] h-1/2 w-[120%]" />
+      <div className="plastic-card-texture pointer-events-none absolute inset-0 opacity-80" />
+      <div className="pointer-events-none absolute -right-8 -bottom-10 h-36 w-36 rounded-full bg-white/15" />
+      <div className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/30" />
 
       <div className="relative z-10 flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2.5">
           <span
             className={cn(
-              "grid shrink-0 place-items-center rounded-xl bg-white/14 font-bold tracking-tight ring-1 ring-white/25 backdrop-blur-sm",
+              "grid shrink-0 place-items-center rounded-xl bg-white/18 font-bold tracking-tight shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] ring-1 ring-white/25",
               compact ? "h-8 w-8 text-sm" : "h-10 w-10 text-base",
             )}
           >
             {mark}
           </span>
-          <span className={cn("truncate font-semibold tracking-wide", compact ? "text-sm" : "text-base")}>{name}</span>
+          <span className={cn("truncate font-semibold tracking-[0.08em]", compact ? "text-sm" : "text-base")}>{name}</span>
         </div>
         <Contactless compact={compact} />
       </div>
 
-      <div className="relative z-10">
+      <div className="relative z-10 flex items-center gap-3">
         <Chip compact={compact} />
+        <div className={cn("rounded-sm bg-black/25", compact ? "h-3.5 w-14" : "h-4 w-16")} aria-hidden />
       </div>
 
       <div className="relative z-10 min-w-0">
         {typeof balance === "number" ? (
           <>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/70">Open balance</p>
-            <p className={cn("mt-0.5 font-display font-semibold tabular-nums tracking-tight", compact ? "text-xl" : "text-2xl")}>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/75">Open balance</p>
+            <p className={cn("mt-0.5 font-display font-semibold tabular-nums tracking-tight drop-shadow-sm", compact ? "text-xl" : "text-2xl")}>
               {formatPHP(balance)}
             </p>
           </>
@@ -105,7 +107,7 @@ export function CardVisual({
             •••• {lastFour || "0000"}
           </p>
         )}
-        <div className="mt-2 flex items-end justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/70">
+        <div className="mt-2 flex items-end justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/75">
           <span className="truncate">{holder || "CardFlow"}</span>
           <span className="shrink-0">{lastFour ? `••${lastFour}` : "CardFlow"}</span>
         </div>

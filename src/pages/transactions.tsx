@@ -7,12 +7,13 @@ import { TransactionTotals } from "@/components/transaction-totals";
 import { EmptyState, PageHeader } from "@/components/ui/page-header";
 import { db, getDefaultPeriodFilter } from "@/lib/db";
 import { findClosestNextPeriod } from "@/lib/period-preference";
+import { sortCards } from "@/lib/card-brands";
 import { filterTransactions, sortTransactionsByCreated, sumTransactions, type CreatedSort } from "@/lib/summaries";
 
 export function TransactionsPage() {
   const search = useSearch({ from: "/transactions" });
   const navigate = useNavigate({ from: "/transactions" });
-  const cards = useLiveQuery(() => db.cards.toArray()) ?? [];
+  const cards = sortCards(useLiveQuery(() => db.cards.toArray()) ?? []);
   const periods = useLiveQuery(() => db.periods.orderBy("period_date").reverse().toArray()) ?? [];
   const allTxns = useLiveQuery(() => db.transactions.toArray()) ?? [];
   const [q, setQ] = useState(search.q ?? "");
